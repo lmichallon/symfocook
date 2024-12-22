@@ -1,0 +1,812 @@
+[
+  {
+    "id": 1,
+    "title": "Soupe de courgettes au basilic",
+    "content": "1. Lavez et coupez les courgettes en rondelles.\n2. Faites-les cuire dans une casserole avec de l'eau bouillante pendant 15 minutes.\n3. Mixez les courgettes avec le basilic et le lait jusqu'à obtention d'une texture lisse.\n4. Servez chaud avec un filet d'huile d'olive.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 4,
+    "author_id": 2
+  },
+  {
+    "id": 2,
+    "title": "Tarte tatin aux pommes",
+    "content": "1. Préchauffez le four à 180°C.\n2. Épluchez les pommes et coupez-les en quartiers.\n3. Faites fondre le beurre dans une poêle et ajoutez les pommes avec du sucre pour les caraméliser.\n4. Disposez les pommes dans un moule et recouvrez avec la pâte brisée.\n5. Enfournez pendant 40 minutes.\n6. Démoulez la tarte en la retournant sur une assiette.",
+    "duration": 90,
+    "difficulty": "Moyen",
+    "category_id": 3,
+    "author_id": 3
+  },
+  {
+    "id": 3,
+    "title": "Ratatouille provençale",
+    "content": "1. Lavez et coupez tous les légumes en petits morceaux.\n2. Faites revenir l'oignon et l'ail dans une poêle avec de l'huile d'olive.\n3. Ajoutez les légumes et laissez mijoter à feu doux pendant 40 minutes.\n4. Remuez régulièrement et assaisonnez avec du sel et du poivre.\n5. Servez chaud ou froid.",
+    "duration": 60,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 4
+  },
+  {
+    "id": 4,
+    "title": "Poulet rôti aux herbes",
+    "content": "1. Préchauffez le four à 200°C.\n2. Badigeonnez le poulet avec de l'huile d'olive et assaisonnez-le avec du sel, du poivre, du thym et du romarin.\n3. Placez-le dans un plat allant au four et enfournez pendant 1 heure.\n4. Arrosez régulièrement le poulet avec son jus pour qu'il reste juteux.\n5. Laissez reposer 10 minutes avant de le découper et de servir.",
+    "duration": 90,
+    "difficulty": "Facile",
+    "category_id": 2,
+    "author_id": 5
+  },
+  {
+    "id": 5,
+    "title": "Salade de quinoa aux légumes",
+    "content": "1. Faites cuire le quinoa dans une casserole avec de l'eau bouillante pendant 15 minutes.\n2. Lavez et coupez les légumes en petits morceaux.\n3. Dans un saladier, mélangez le quinoa, les légumes et les petits pois.\n4. Assaisonnez avec de l'huile d'olive, du sel et du poivre.\n5. Servez frais.",
+    "duration": 25,
+    "difficulty": "Facile",
+    "category_id": 5,
+    "author_id": 2
+  },
+  {
+    "id": 6,
+    "title": "Béchamel maison",
+    "content": "1. Faites fondre le beurre dans une casserole.\n2. Ajoutez la farine et remuez pour obtenir un roux.\n3. Versez le lait progressivement tout en fouettant pour éviter les grumeaux.\n4. Faites cuire à feu doux jusqu'à ce que la sauce épaississe.\n5. Assaisonnez avec du sel, du poivre et une pincée de muscade.",
+    "duration": 15,
+    "difficulty": "Facile",
+    "category_id": 12,
+    "author_id": 7
+  },
+  {
+    "id": 7,
+    "title": "Lasagnes végétariennes",
+    "content": "1. Préchauffez le four à 180°C.\n2. Préparez une sauce tomate maison avec des tomates, de l'ail, et des herbes.\n3. Coupez les légumes (courgettes, carottes) en fines lamelles.\n4. Montez les lasagnes en alternant feuilles, légumes, sauce tomate et fromage râpé.\n5. Enfournez pendant 40 minutes.",
+    "duration": 60,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 8
+  },
+  {
+    "id": 8,
+    "title": "Gratin dauphinois",
+    "content": "1. Préchauffez le four à 180°C.\n2. Épluchez les pommes de terre et coupez-les en fines rondelles.\n3. Disposez les rondelles dans un plat en couches avec de la crème et du fromage.\n4. Enfournez pendant 1 heure.\n5. Servez chaud.",
+    "duration": 90,
+    "difficulty": "Facile",
+    "category_id": 2,
+    "author_id": 9
+  },
+  {
+    "id": 9,
+    "title": "Curry de légumes",
+    "content": "1. Faites revenir des oignons et de l'ail dans une poêle avec de l'huile.\n2. Ajoutez des légumes (patate douce, carottes, pois chiches).\n3. Incorporez du lait de coco et des épices à curry.\n4. Laissez mijoter pendant 30 minutes.\n5. Servez avec du riz.",
+    "duration": 45,
+    "difficulty": "Facile",
+    "category_id": 10,
+    "author_id": 10
+  },
+  {
+    "id": 10,
+    "title": "Quiche lorraine",
+    "content": "1. Préchauffez le four à 200°C.\n2. Préparez une pâte brisée.\n3. Faites revenir des lardons et de l'oignon.\n4. Mélangez des œufs, de la crème et du fromage râpé.\n5. Disposez la garniture sur la pâte et enfournez pendant 40 minutes.",
+    "duration": 60,
+    "difficulty": "Moyen",
+    "category_id": 1,
+    "author_id": 2
+  },
+  {
+    "id": 11,
+    "title": "Crêpes sucrées",
+    "content": "1. Préparez une pâte à crêpes avec de la farine, des œufs, du lait et du sucre.\n2. Faites chauffer une poêle légèrement huilée.\n3. Versez une louche de pâte et faites cuire chaque côté.\n4. Servez avec du sucre, de la confiture ou du chocolat.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 3,
+    "author_id": 3
+  },
+  {
+    "id": 12,
+    "title": "Soupe de potiron",
+    "content": "1. Coupez le potiron en cubes.\n2. Faites-le cuire dans une casserole avec de l'eau et un oignon.\n3. Mixez jusqu'à obtention d'une texture veloutée.\n4. Ajoutez de la crème et servez chaud.",
+    "duration": 40,
+    "difficulty": "Facile",
+    "category_id": 4,
+    "author_id": 4
+  },
+  {
+    "id": 13,
+    "title": "Tarte aux fraises",
+    "content": "1. Préparez une pâte sablée.\n2. Faites cuire la pâte à blanc.\n3. Garnissez avec de la crème pâtissière et des fraises fraîches.\n4. Réservez au frais avant de servir.",
+    "duration": 90,
+    "difficulty": "Moyen",
+    "category_id": 3,
+    "author_id": 5
+  },
+  {
+    "id": 14,
+    "title": "Riz cantonais",
+    "content": "1. Faites cuire le riz et laissez-le refroidir.\n2. Faites revenir des légumes (petits pois, carottes) avec des œufs brouillés.\n3. Ajoutez le riz et mélangez avec de la sauce soja.\n4. Servez chaud.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 11,
+    "author_id": 6
+  },
+  {
+    "id": 15,
+    "title": "Poulet tikka masala",
+    "content": "1. Faites mariner le poulet dans du yaourt et des épices.\n2. Faites-le cuire dans une poêle.\n3. Préparez une sauce tomate épicée avec du lait de coco.\n4. Mélangez le poulet et la sauce.\n5. Servez avec du riz.",
+    "duration": 60,
+    "difficulty": "Difficile",
+    "category_id": 11,
+    "author_id": 2
+  },
+  {
+    "id": 16,
+    "title": "Gâteau au chocolat fondant",
+    "content": "1. Faites fondre du chocolat avec du beurre.\n2. Mélangez des œufs, du sucre et de la farine.\n3. Incorporez le chocolat fondu.\n4. Versez dans un moule et enfournez 20 minutes.\n5. Laissez tiédir avant de servir.",
+    "duration": 45,
+    "difficulty": "Facile",
+    "category_id": 3,
+    "author_id": 8
+  },
+  {
+    "id": 17,
+    "title": "Mousse au chocolat",
+    "content": "1. Faites fondre le chocolat au bain-marie.\n2. Séparez les blancs des jaunes d'œufs.\n3. Incorporez les jaunes au chocolat fondu.\n4. Montez les blancs en neige et incorporez-les délicatement au mélange.\n5. Réfrigérez pendant 2 heures avant de servir.",
+    "duration": 20,
+    "difficulty": "Facile",
+    "category_id": 3,
+    "author_id": 9
+  },
+  {
+    "id": 18,
+    "title": "Tartiflette",
+    "content": "1. Épluchez et coupez les pommes de terre en rondelles.\n2. Faites revenir les lardons et les oignons dans une poêle.\n3. Disposez les pommes de terre, les lardons et les oignons dans un plat.\n4. Ajoutez le reblochon coupé en deux par-dessus.\n5. Enfournez à 200°C pendant 25 minutes.",
+    "duration": 50,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 4
+  },
+  {
+    "id": 19,
+    "title": "Soupe à l'oignon gratinée",
+    "content": "1. Faites revenir les oignons émincés dans du beurre jusqu'à ce qu'ils soient dorés.\n2. Ajoutez le bouillon de volaille et laissez mijoter 20 minutes.\n3. Versez la soupe dans des bols et ajoutez du pain grillé et du fromage râpé.\n4. Passez au four pour gratiner.\n5. Servez chaud.",
+    "duration": 40,
+    "difficulty": "Moyen",
+    "category_id": 4,
+    "author_id": 8
+  },
+  {
+    "id": 20,
+    "title": "Clafoutis aux cerises",
+    "content": "1. Préchauffez le four à 180°C.\n2. Battez les œufs avec le sucre, la farine et le lait.\n3. Disposez les cerises dans un plat beurré et versez la pâte par-dessus.\n4. Enfournez pendant 35 minutes.\n5. Laissez refroidir avant de servir.",
+    "duration": 45,
+    "difficulty": "Facile",
+    "category_id": 3,
+    "author_id": 7
+  },
+  {
+    "id": 21,
+    "title": "Pizza maison",
+    "content": "1. Préparez une pâte à pizza et laissez-la reposer.\n2. Étalez la pâte et ajoutez la sauce tomate.\n3. Garnissez avec de la mozzarella, du jambon et des champignons.\n4. Enfournez à 220°C pendant 15 minutes.\n5. Servez chaud.",
+    "duration": 50,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 10
+  },
+  {
+    "id": 22,
+    "title": "Rouleaux de printemps",
+    "content": "1. Trempez les galettes de riz dans l'eau tiède pour les ramollir.\n2. Garnissez avec des légumes, des crevettes et des vermicelles.\n3. Roulez les galettes et servez avec une sauce aux cacahuètes.\n4. Dégustez frais.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 11,
+    "author_id": 3
+  },
+  {
+    "id": 23,
+    "title": "Bœuf bourguignon",
+    "content": "1. Faites revenir les morceaux de bœuf dans une cocotte.\n2. Ajoutez les carottes, l'oignon et le vin rouge.\n3. Laissez mijoter à feu doux pendant 2 heures.\n4. Servez avec des pommes de terre vapeur.",
+    "duration": 150,
+    "difficulty": "Difficile",
+    "category_id": 2,
+    "author_id": 5
+  },
+  {
+    "id": 24,
+    "title": "Cupcakes au citron",
+    "content": "1. Préparez une pâte avec de la farine, des œufs, du sucre, et du zeste de citron.\n2. Répartissez la pâte dans des moules à cupcakes.\n3. Faites cuire au four à 180°C pendant 20 minutes.\n4. Décorez avec un glaçage au citron.",
+    "duration": 60,
+    "difficulty": "Moyen",
+    "category_id": 3,
+    "author_id": 2
+  },
+  {
+    "id": 25,
+    "title": "Lasagnes au saumon et épinards",
+    "content": "1. Préparez une béchamel et une sauce aux épinards.\n2. Alternez les couches de feuilles de lasagnes, de saumon et de sauce.\n3. Terminez avec du fromage râpé.\n4. Faites cuire au four à 200°C pendant 40 minutes.",
+    "duration": 70,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 4
+  },
+  {
+    "id": 26,
+    "title": "Cheesecake au speculoos",
+    "content": "1. Préparez une base avec des biscuits speculoos écrasés et du beurre fondu.\n2. Mélangez du fromage frais avec du sucre et des œufs.\n3. Versez sur la base et faites cuire au four à 160°C pendant 45 minutes.\n4. Réfrigérez avant de servir.",
+    "duration": 90,
+    "difficulty": "Moyen",
+    "category_id": 3,
+    "author_id": 9
+  },
+  {
+    "id": 27,
+    "title": "Omelette aux fines herbes",
+    "content": "1. Battez les œufs avec du sel, du poivre et des herbes fraîches hachées.\n2. Faites chauffer une poêle avec un peu de beurre.\n3. Versez les œufs battus et faites cuire jusqu'à consistance désirée.\n4. Servez chaud.",
+    "duration": 10,
+    "difficulty": "Facile",
+    "category_id": 8,
+    "author_id": 5
+  },
+  {
+    "id": 28,
+    "title": "Gaufres maison",
+    "content": "1. Mélangez la farine, le sucre, les œufs et le lait pour obtenir une pâte homogène.\n2. Faites chauffer un gaufrier.\n3. Versez une louche de pâte et faites cuire jusqu'à ce que les gaufres soient dorées.\n4. Servez avec du sucre glace ou de la confiture.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 6,
+    "author_id": 7
+  },
+  {
+    "id": 29,
+    "title": "Salade de pâtes au pesto",
+    "content": "1. Faites cuire les pâtes dans de l'eau bouillante salée.\n2. Mélangez les pâtes refroidies avec du pesto, des tomates cerises et de la mozzarella.\n3. Servez frais.",
+    "duration": 20,
+    "difficulty": "Facile",
+    "category_id": 5,
+    "author_id": 9
+  },
+  {
+    "id": 30,
+    "title": "Blanquette de veau",
+    "content": "1. Faites revenir les morceaux de veau avec un peu de beurre.\n2. Ajoutez les carottes, les champignons et de l'eau pour couvrir.\n3. Laissez mijoter 2 heures.\n4. Préparez une sauce avec de la crème et de la farine et incorporez-la à la viande.\n5. Servez chaud avec du riz.",
+    "duration": 150,
+    "difficulty": "Difficile",
+    "category_id": 2,
+    "author_id": 6
+  },
+  {
+    "id": 31,
+    "title": "Tarte salée au chèvre et épinards",
+    "content": "1. Préchauffez le four à 180°C.\n2. Étalez une pâte brisée dans un moule.\n3. Garnissez avec des épinards cuits et des rondelles de fromage de chèvre.\n4. Enfournez pendant 40 minutes.\n5. Servez chaud ou tiède.",
+    "duration": 60,
+    "difficulty": "Moyen",
+    "category_id": 1,
+    "author_id": 4
+  },
+  {
+    "id": 32,
+    "title": "Crème brûlée",
+    "content": "1. Mélangez la crème, les jaunes d'œufs, le sucre et la vanille.\n2. Versez dans des ramequins et faites cuire au bain-marie au four à 150°C pendant 30 minutes.\n3. Laissez refroidir, puis saupoudrez de sucre et caramélisez au chalumeau.\n4. Servez frais.",
+    "duration": 50,
+    "difficulty": "Moyen",
+    "category_id": 3,
+    "author_id": 8
+  },
+  {
+    "id": 33,
+    "title": "Velouté de champignons",
+    "content": "1. Faites revenir les champignons avec un oignon dans du beurre.\n2. Ajoutez du bouillon de légumes et laissez mijoter 15 minutes.\n3. Mixez pour obtenir une texture veloutée.\n4. Ajoutez de la crème avant de servir.",
+    "duration": 40,
+    "difficulty": "Facile",
+    "category_id": 4,
+    "author_id": 2
+  },
+  {
+    "id": 34,
+    "title": "Burger maison",
+    "content": "1. Préparez des steaks hachés et faites-les cuire.\n2. Garnissez des pains à burger avec de la salade, des tomates, des oignons et le steak.\n3. Ajoutez du fromage et une sauce au choix.\n4. Servez avec des frites.",
+    "duration": 30,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 10
+  },
+  {
+    "id": 35,
+    "title": "Tiramisu",
+    "content": "1. Préparez une crème avec du mascarpone, des œufs et du sucre.\n2. Trempez des biscuits dans du café fort.\n3. Montez le tiramisu en alternant biscuits et crème.\n4. Saupoudrez de cacao et réfrigérez 3 heures.\n5. Servez frais.",
+    "duration": 40,
+    "difficulty": "Facile",
+    "category_id": 3,
+    "author_id": 5
+  },
+  {
+    "id": 36,
+    "title": "Soupe miso",
+    "content": "1. Faites chauffer de l'eau avec de la pâte miso.\n2. Ajoutez des cubes de tofu, des algues et des champignons émincés.\n3. Laissez mijoter 10 minutes.\n4. Servez chaud avec des oignons verts.",
+    "duration": 20,
+    "difficulty": "Facile",
+    "category_id": 10,
+    "author_id": 7
+  },
+  {
+    "id": 37,
+    "title": "Pancakes légers",
+    "content": "1. Mélangez la farine, le sucre, le lait et les œufs jusqu'à obtention d'une pâte lisse.\n2. Faites chauffer une poêle avec un peu de beurre.\n3. Versez une petite louche de pâte et faites cuire des deux côtés.\n4. Servez avec du sirop d'érable.",
+    "duration": 15,
+    "difficulty": "Facile",
+    "category_id": 8,
+    "author_id": 5
+  },
+  {
+    "id": 38,
+    "title": "Muffins aux myrtilles",
+    "content": "1. Mélangez la farine, la levure, le sucre et une pincée de sel.\n2. Ajoutez le lait, les œufs et le beurre fondu.\n3. Incorporez délicatement les myrtilles.\n4. Versez dans des moules à muffins et enfournez 20 minutes à 180°C.",
+    "duration": 30,
+    "difficulty": "Moyen",
+    "category_id": 6,
+    "author_id": 7
+  },
+  {
+    "id": 39,
+    "title": "Salade César",
+    "content": "1. Lavez et coupez la laitue.\n2. Préparez la sauce César en mélangeant la mayonnaise, le parmesan râpé et une pincée de sel.\n3. Ajoutez des croûtons et du poulet grillé.\n4. Mélangez le tout et servez.",
+    "duration": 20,
+    "difficulty": "Facile",
+    "category_id": 5,
+    "author_id": 9
+  },
+  {
+    "id": 40,
+    "title": "Poulet basquaise",
+    "content": "1. Faites revenir le poulet dans une cocotte avec de l'huile d'olive.\n2. Ajoutez les poivrons, les tomates, l'oignon et l'ail.\n3. Laissez mijoter 1 heure à feu doux.\n4. Servez chaud avec du riz ou des pâtes.",
+    "duration": 90,
+    "difficulty": "Difficile",
+    "category_id": 2,
+    "author_id": 6
+  },
+  {
+    "id": 41,
+    "title": "Quiche aux légumes",
+    "content": "1. Préchauffez le four à 180°C.\n2. Étalez une pâte brisée dans un moule.\n3. Garnissez avec des légumes sautés et un mélange d'œufs, de crème et de fromage.\n4. Enfournez pendant 40 minutes.\n5. Servez chaud ou froid.",
+    "duration": 60,
+    "difficulty": "Moyen",
+    "category_id": 1,
+    "author_id": 4
+  },
+  {
+    "id": 42,
+    "title": "Gâteau roulé au chocolat",
+    "content": "1. Préparez une génoise en fouettant les œufs et le sucre.\n2. Étalez la pâte sur une plaque et faites cuire 10 minutes au four.\n3. Étalez une ganache au chocolat sur la génoise et roulez-la.\n4. Saupoudrez de sucre glace avant de servir.",
+    "duration": 40,
+    "difficulty": "Moyen",
+    "category_id": 3,
+    "author_id": 2
+  },
+  {
+    "id": 43,
+    "title": "Velouté de carottes au cumin",
+    "content": "1. Épluchez et coupez les carottes en rondelles.\n2. Faites-les cuire avec de l'eau et un bouillon de légumes.\n3. Mixez avec une pincée de cumin.\n4. Servez chaud avec une cuillère de crème.",
+    "duration": 40,
+    "difficulty": "Facile",
+    "category_id": 4,
+    "author_id": 3
+  },
+  {
+    "id": 44,
+    "title": "Tacos mexicains",
+    "content": "1. Faites cuire le bœuf haché avec des épices mexicaines.\n2. Garnissez les tortillas avec le bœuf, des légumes et une sauce.\n3. Roulez les tacos et servez avec une salade.\n4. Dégustez chaud.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 11,
+    "author_id": 10
+  },
+  {
+    "id": 45,
+    "title": "Soupe de lentilles corail",
+    "content": "1. Faites revenir l'oignon dans une casserole avec un peu d'huile.\n2. Ajoutez les lentilles corail et le bouillon de légumes.\n3. Laissez cuire 20 minutes et mixez.\n4. Servez avec un filet de jus de citron.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 10,
+    "author_id": 7
+  },
+  {
+    "id": 46,
+    "title": "Cheesecake sans cuisson",
+    "content": "1. Préparez une base avec des biscuits écrasés et du beurre.\n2. Mélangez du fromage frais avec du sucre et de la crème.\n3. Versez sur la base et laissez prendre au frais 4 heures.\n4. Décorez avec un coulis de fruits rouges avant de servir.",
+    "duration": 30,
+    "difficulty": "Moyen",
+    "category_id": 3,
+    "author_id": 2
+  },
+  {
+    "id": 47,
+    "title": "Gratin de potiron et noisettes",
+    "content": "1. Épluchez et coupez le potiron en dés.\n2. Disposez-le dans un plat à gratin avec de la crème et des noisettes concassées.\n3. Parsemez de fromage râpé et enfournez à 180°C pendant 40 minutes.\n4. Servez chaud.",
+    "duration": 60,
+    "difficulty": "Facile",
+    "category_id": 9,
+    "author_id": 5
+  },
+  {
+    "id": 48,
+    "title": "Tarte tatin aux échalotes",
+    "content": "1. Épluchez les échalotes et faites-les revenir dans du beurre avec un peu de sucre.\n2. Disposez-les dans un moule et recouvrez d'une pâte feuilletée.\n3. Enfournez à 180°C pendant 35 minutes.\n4. Retournez la tarte et servez tiède.",
+    "duration": 50,
+    "difficulty": "Moyen",
+    "category_id": 1,
+    "author_id": 7
+  },
+  {
+    "id": 49,
+    "title": "Clafoutis de poires et amandes",
+    "content": "1. Préchauffez le four à 180°C.\n2. Mélangez les œufs, le sucre, la farine et le lait.\n3. Disposez des poires et des amandes effilées dans un plat beurré et versez la pâte.\n4. Faites cuire pendant 40 minutes.\n5. Servez tiède.",
+    "duration": 60,
+    "difficulty": "Facile",
+    "category_id": 3,
+    "author_id": 9
+  },
+  {
+    "id": 50,
+    "title": "Curry d'aubergines",
+    "content": "1. Coupez les aubergines en cubes et faites-les revenir dans de l'huile.\n2. Ajoutez des épices, du lait de coco et un peu de bouillon.\n3. Laissez mijoter 20 minutes.\n4. Servez avec du riz.",
+    "duration": 40,
+    "difficulty": "Moyen",
+    "category_id": 10,
+    "author_id": 6
+  },
+  {
+    "id": 51,
+    "title": "Velouté de chou-fleur au roquefort",
+    "content": "1. Faites cuire le chou-fleur dans du bouillon.\n2. Mixez avec le roquefort et un peu de crème.\n3. Servez chaud avec des croûtons.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 4,
+    "author_id": 8
+  },
+  {
+    "id": 52,
+    "title": "Galettes de quinoa et carottes",
+    "content": "1. Mélangez du quinoa cuit avec des carottes râpées, des œufs et un peu de farine.\n2. Formez des galettes et faites-les cuire dans une poêle chaude.\n3. Servez avec une sauce au yaourt.",
+    "duration": 40,
+    "difficulty": "Facile",
+    "category_id": 5,
+    "author_id": 10
+  },
+  {
+    "id": 53,
+    "title": "Tacos aux pois chiches",
+    "content": "1. Faites revenir des pois chiches avec des épices.\n2. Garnissez des tortillas avec les pois chiches, de la salade et une sauce au tahini.\n3. Servez avec une salade verte.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 9,
+    "author_id": 3
+  },
+  {
+    "id": 54,
+    "title": "Cake salé au fromage et noix",
+    "content": "1. Mélangez la farine, les œufs, le lait et l'huile.\n2. Incorporez le fromage râpé et les noix concassées.\n3. Versez dans un moule et faites cuire à 180°C pendant 40 minutes.\n4. Servez tiède ou froid.",
+    "duration": 60,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 4
+  },
+  {
+    "id": 55,
+    "title": "Crème de marrons au rhum",
+    "content": "1. Mélangez des marrons cuits avec du sucre et un peu de rhum.\n2. Mixez jusqu'à obtention d'une crème lisse.\n3. Servez frais en dessert ou en accompagnement.",
+    "duration": 20,
+    "difficulty": "Facile",
+    "category_id": 3,
+    "author_id": 9
+  },
+  {
+    "id": 56,
+    "title": "Pain perdu au caramel",
+    "content": "1. Trempez des tranches de pain dans un mélange d'œufs, de lait et de sucre.\n2. Faites-les dorer à la poêle avec du beurre.\n3. Préparez un caramel et nappez les tranches avant de servir.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 6,
+    "author_id": 7
+  },
+  {
+    "id": 57,
+    "title": "Ratatouille traditionnelle",
+    "content": "1. Coupez tous les légumes en dés.\n2. Faites revenir l'oignon et l'ail dans de l'huile d'olive.\n3. Ajoutez les aubergines, les courgettes, les poivrons et les tomates.\n4. Laissez mijoter 30 minutes à feu doux.\n5. Servez chaud avec des herbes fraîches.",
+    "duration": 45,
+    "difficulty": "Facile",
+    "category_id": 9,
+    "author_id": 7
+  },
+  {
+    "id": 58,
+    "title": "Tarte fine aux pommes",
+    "content": "1. Étalez une pâte feuilletée sur une plaque de cuisson.\n2. Disposez des tranches de pommes en rosace.\n3. Saupoudrez de sucre et ajoutez quelques noisettes de beurre.\n4. Enfournez à 180°C pendant 20 minutes.\n5. Servez tiède.",
+    "duration": 40,
+    "difficulty": "Facile",
+    "category_id": 3,
+    "author_id": 8
+  },
+  {
+    "id": 59,
+    "title": "Soupe de pois cassés",
+    "content": "1. Faites tremper les pois cassés dans de l'eau pendant 2 heures.\n2. Faites revenir l'oignon et l'ail dans une casserole.\n3. Ajoutez les pois cassés et du bouillon de légumes.\n4. Laissez cuire 40 minutes, puis mixez.\n5. Servez chaud.",
+    "duration": 60,
+    "difficulty": "Moyen",
+    "category_id": 4,
+    "author_id": 5
+  },
+  {
+    "id": 60,
+    "title": "Poulet au citron confit",
+    "content": "1. Faites revenir les morceaux de poulet dans une cocotte.\n2. Ajoutez des morceaux de citron confit et des olives.\n3. Arrosez de bouillon et laissez mijoter 40 minutes.\n4. Servez avec du riz.",
+    "duration": 70,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 2
+  },
+  {
+    "id": 61,
+    "title": "Clafoutis aux figues",
+    "content": "1. Préchauffez le four à 180°C.\n2. Mélangez les œufs, le sucre, la farine et le lait.\n3. Disposez les figues coupées en deux dans un plat beurré et versez la pâte.\n4. Faites cuire pendant 30 minutes.\n5. Servez tiède.",
+    "duration": 50,
+    "difficulty": "Facile",
+    "category_id": 3,
+    "author_id": 9
+  },
+  {
+    "id": 62,
+    "title": "Tacos végétariens",
+    "content": "1. Faites revenir des haricots rouges avec des épices.\n2. Garnissez les tortillas avec les haricots, de l'avocat et de la salade.\n3. Ajoutez une sauce au yaourt et roulez les tortillas.\n4. Servez chaud ou froid.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 9,
+    "author_id": 10
+  },
+  {
+    "id": 63,
+    "title": "Gratin de brocolis au cheddar",
+    "content": "1. Faites cuire les brocolis à la vapeur.\n2. Disposez-les dans un plat à gratin.\n3. Préparez une béchamel et versez-la sur les brocolis.\n4. Ajoutez du cheddar râpé et enfournez à 200°C pendant 15 minutes.\n5. Servez chaud.",
+    "duration": 40,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 4
+  },
+  {
+    "id": 64,
+    "title": "Velouté de potimarron",
+    "content": "1. Coupez le potimarron en morceaux et retirez les graines.\n2. Faites cuire les morceaux dans du bouillon de légumes.\n3. Mixez avec un peu de crème et ajoutez des épices.\n4. Servez chaud avec des graines de courge.",
+    "duration": 45,
+    "difficulty": "Facile",
+    "category_id": 4,
+    "author_id": 7
+  },
+  {
+    "id": 65,
+    "title": "Crumble aux fruits rouges",
+    "content": "1. Disposez les fruits rouges dans un plat beurré.\n2. Préparez un mélange de farine, sucre et beurre pour le crumble.\n3. Émiettez le mélange sur les fruits.\n4. Faites cuire au four à 180°C pendant 25 minutes.\n5. Servez tiède avec une boule de glace.",
+    "duration": 50,
+    "difficulty": "Moyen",
+    "category_id": 3,
+    "author_id": 8
+  },
+  {
+    "id": 66,
+    "title": "Galette de pommes de terre",
+    "content": "1. Râpez les pommes de terre et mélangez-les avec un œuf et une pincée de sel.\n2. Formez des galettes et faites-les cuire dans une poêle chaude avec de l'huile.\n3. Servez chaud avec une sauce au yaourt.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 2,
+    "author_id": 6
+  },
+  {
+    "id": 67,
+    "title": "Velouté de betteraves",
+    "content": "1. Épluchez et coupez les betteraves en morceaux.\n2. Faites-les cuire dans du bouillon de légumes.\n3. Mixez avec un peu de crème et servez chaud avec des herbes fraîches.",
+    "duration": 40,
+    "difficulty": "Facile",
+    "category_id": 4,
+    "author_id": 7
+  },
+  {
+    "id": 68,
+    "title": "Gâteau à la noix de coco",
+    "content": "1. Mélangez la farine, le sucre, les œufs et la noix de coco râpée.\n2. Versez la pâte dans un moule et faites cuire au four à 180°C pendant 35 minutes.\n3. Laissez refroidir et servez avec une crème anglaise.",
+    "duration": 50,
+    "difficulty": "Moyen",
+    "category_id": 3,
+    "author_id": 5
+  },
+  {
+    "id": 69,
+    "title": "Curry de pois chiches",
+    "content": "1. Faites revenir les oignons et l'ail dans une casserole.\n2. Ajoutez les pois chiches, du lait de coco et des épices.\n3. Laissez mijoter 20 minutes.\n4. Servez chaud avec du riz.",
+    "duration": 40,
+    "difficulty": "Facile",
+    "category_id": 10,
+    "author_id": 8
+  },
+  {
+    "id": 70,
+    "title": "Salade de quinoa aux légumes",
+    "content": "1. Faites cuire le quinoa et laissez-le refroidir.\n2. Mélangez avec des légumes grillés et une vinaigrette.\n3. Ajoutez des graines de tournesol et servez frais.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 5,
+    "author_id": 9
+  },
+  {
+    "id": 71,
+    "title": "Tarte au saumon et épinards",
+    "content": "1. Étalez une pâte brisée dans un moule.\n2. Garnissez avec du saumon fumé et des épinards.\n3. Versez un mélange d'œufs et de crème.\n4. Faites cuire au four à 180°C pendant 30 minutes.\n5. Servez chaud.",
+    "duration": 50,
+    "difficulty": "Moyen",
+    "category_id": 1,
+    "author_id": 10
+  },
+  {
+    "id": 72,
+    "title": "Crêpes Suzette",
+    "content": "1. Préparez une pâte à crêpes et faites cuire les crêpes.\n2. Préparez une sauce avec du beurre, du sucre, du jus d'orange et du Grand Marnier.\n3. Nappez les crêpes de la sauce et flambez avant de servir.",
+    "duration": 40,
+    "difficulty": "Difficile",
+    "category_id": 3,
+    "author_id": 4
+  },
+  {
+    "id": 73,
+    "title": "Ragoût de lentilles",
+    "content": "1. Faites revenir les oignons et les carottes dans une cocotte.\n2. Ajoutez les lentilles, du bouillon et des épices.\n3. Laissez mijoter 30 minutes.\n4. Servez chaud avec du pain frais.",
+    "duration": 60,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 6
+  },
+  {
+    "id": 74,
+    "title": "Smoothie aux fruits exotiques",
+    "content": "1. Mixez la mangue, l'ananas et le lait de coco.\n2. Ajoutez du jus d'orange et des glaçons.\n3. Servez frais dans des verres.",
+    "duration": 10,
+    "difficulty": "Facile",
+    "category_id": 7,
+    "author_id": 2
+  },
+  {
+    "id": 75,
+    "title": "Omelette au fromage et épices",
+    "content": "1. Battez les œufs avec du sel, du poivre, du fromage râpé et une pincée de paprika.\n2. Faites chauffer une poêle avec un peu d'huile et versez le mélange.\n3. Laissez cuire quelques minutes jusqu'à consistance souhaitée.\n4. Servez chaud.",
+    "duration": 10,
+    "difficulty": "Facile",
+    "category_id": 8,
+    "author_id": 6
+  },
+  {
+    "id": 76,
+    "title": "Salade de roquette et noix",
+    "content": "1. Mélangez la roquette avec des cerneaux de noix et des dés de fromage de chèvre.\n2. Préparez une vinaigrette avec de l'huile d'olive, du vinaigre balsamique et du miel.\n3. Mélangez et servez frais.",
+    "duration": 15,
+    "difficulty": "Facile",
+    "category_id": 5,
+    "author_id": 7
+  },
+  {
+    "id": 77,
+    "title": "Tarte rustique aux poires",
+    "content": "1. Étalez une pâte sablée sur une plaque.\n2. Disposez des tranches de poires et saupoudrez de sucre roux.\n3. Pliez les bords vers l'intérieur et enfournez à 180°C pendant 30 minutes.\n4. Servez tiède avec une boule de glace vanille.",
+    "duration": 40,
+    "difficulty": "Moyen",
+    "category_id": 3,
+    "author_id": 8
+  },
+  {
+    "id": 78,
+    "title": "Soupe au chou vert",
+    "content": "1. Coupez le chou vert en fines lanières.\n2. Faites-le cuire avec des pommes de terre et de l'oignon dans du bouillon.\n3. Mixez pour obtenir une soupe lisse et servez chaud.",
+    "duration": 30,
+    "difficulty": "Facile",
+    "category_id": 4,
+    "author_id": 9
+  },
+  {
+    "id": 79,
+    "title": "Poulet aux champignons et vin blanc",
+    "content": "1. Faites dorer les morceaux de poulet dans une cocotte.\n2. Ajoutez les champignons émincés, du vin blanc et de la crème.\n3. Laissez mijoter 40 minutes et servez chaud avec du riz.",
+    "duration": 70,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 10
+  },
+  {
+    "id": 80,
+    "title": "Wraps de légumes grillés",
+    "content": "1. Faites griller des poivrons, courgettes et aubergines.\n2. Garnissez des tortillas avec les légumes grillés et une sauce au yaourt.\n3. Roulez et servez frais.",
+    "duration": 25,
+    "difficulty": "Facile",
+    "category_id": 11,
+    "author_id": 5
+  },
+  {
+    "id": 81,
+    "title": "Gâteau chocolat-banane",
+    "content": "1. Mélangez la farine, le cacao, les œufs, le sucre et des bananes écrasées.\n2. Versez la pâte dans un moule et faites cuire à 180°C pendant 35 minutes.\n3. Laissez refroidir avant de servir.",
+    "duration": 50,
+    "difficulty": "Moyen",
+    "category_id": 3,
+    "author_id": 4
+  },
+  {
+    "id": 82,
+    "title": "Purée de panais",
+    "content": "1. Épluchez et coupez les panais en morceaux.\n2. Faites-les cuire dans de l'eau salée jusqu'à ce qu'ils soient tendres.\n3. Écrasez-les avec du beurre et de la crème.\n4. Servez chaud avec des herbes fraîches.",
+    "duration": 25,
+    "difficulty": "Facile",
+    "category_id": 2,
+    "author_id": 6
+  },
+  {
+    "id": 83,
+    "title": "Smoothie kiwi et épinards",
+    "content": "1. Mixez le kiwi avec des épinards frais, du jus de pomme et des glaçons.\n2. Servez immédiatement dans des verres.",
+    "duration": 10,
+    "difficulty": "Facile",
+    "category_id": 7,
+    "author_id": 7
+  },
+  {
+    "id": 84,
+    "title": "Risotto aux asperges",
+    "content": "1. Faites revenir l'oignon dans une casserole avec de l'huile d'olive.\n2. Ajoutez le riz à risotto et remuez jusqu'à ce qu'il soit translucide.\n3. Versez le bouillon chaud progressivement en remuant.\n4. Ajoutez les asperges en morceaux et du parmesan râpé en fin de cuisson.\n5. Servez chaud.",
+    "duration": 40,
+    "difficulty": "Moyen",
+    "category_id": 2,
+    "author_id": 6
+  },
+  {
+    "id": 85,
+    "title": "Crème brûlée à la vanille",
+    "content": "1. Mélangez les jaunes d'œufs avec le sucre et la crème.\n2. Ajoutez une gousse de vanille grattée.\n3. Versez dans des ramequins et faites cuire au bain-marie à 150°C pendant 40 minutes.\n4. Laissez refroidir et caramélisez le dessus avant de servir.",
+    "duration": 60,
+    "difficulty": "Difficile",
+    "category_id": 3,
+    "author_id": 8
+  },
+  {
+    "id": 86,
+    "title": "Soupe froide de concombre et menthe",
+    "content": "1. Épluchez et coupez le concombre en morceaux.\n2. Mixez avec du yaourt nature, des feuilles de menthe et un filet de citron.\n3. Assaisonnez et laissez refroidir au réfrigérateur avant de servir frais.",
+    "duration": 20,
+    "difficulty": "Facile",
+    "category_id": 4,
+    "author_id": 2
+  },
+  {
+    "id": 87,
+    "title": "Salade de haricots verts et feta",
+    "content": "1. Faites cuire les haricots verts dans de l'eau salée.\n2. Mélangez-les avec de la feta émiettée et des tomates cerises.\n3. Ajoutez une vinaigrette à l'huile d'olive et au citron.\n4. Servez frais.",
+    "duration": 15,
+    "difficulty": "Facile",
+    "category_id": 5,
+    "author_id": 9
+  },
+  {
+    "id": 88,
+    "title": "Tarte aux figues et chèvre",
+    "content": "1. Étalez une pâte brisée dans un moule.\n2. Garnissez avec des figues coupées et des tranches de chèvre.\n3. Versez un mélange d'œufs et de crème.\n4. Faites cuire au four à 180°C pendant 25 minutes.\n5. Servez tiède.",
+    "duration": 40,
+    "difficulty": "Moyen",
+    "category_id": 1,
+    "author_id": 10
+  },
+  {
+    "id": 89,
+    "title": "Curry de légumes racines",
+    "content": "1. Faites revenir les carottes, les panais et les navets en morceaux dans une cocotte.\n2. Ajoutez du lait de coco et des épices.\n3. Laissez mijoter 25 minutes et servez chaud avec du riz.",
+    "duration": 45,
+    "difficulty": "Moyen",
+    "category_id": 10,
+    "author_id": 5
+  },
+  {
+    "id": 90,
+    "title": "Smoothie orange-carotte-gingembre",
+    "content": "1. Mixez des oranges, des carottes et un morceau de gingembre avec de l'eau.\n2. Filtrez si nécessaire et servez frais avec des glaçons.",
+    "duration": 10,
+    "difficulty": "Facile",
+    "category_id": 7,
+    "author_id": 6
+  }
+]
