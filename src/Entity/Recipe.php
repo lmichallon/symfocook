@@ -154,4 +154,5 @@ class Recipe
 
         return $this;
     }
+
 }

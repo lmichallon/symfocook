@@ -90,9 +90,9 @@ Il faut alors modifier les fonctions "configureFields" de ces contrôleurs pour 
 public function configureFields(string $pageName): iterable 
 {
     return [
-        IdField::new('id')->hideOnForm(),        // "hideOnForm"--> permet de masquer ce champ sur la visualisation des recettes
+        IdField::new('id')->hideOnForm(),        // "hideOnForm"--> permet de masquer ce champ sur les formulaires
         TextField::new('title', 'Titre'),
-        TextareaField::new('content', 'Contenu'),
+        TextareaField::new('content', 'Contenu')->setSortable(false),      // "setSortable(false)"--> permet d'empêcher le tri
         NumberField::new('duration', 'Durée (en minutes)'),
         ChoiceField::new('difficulty', 'Difficulté')
             ->setChoices([
@@ -130,3 +130,36 @@ public function logout(): void
 ```
 ⚠️ Cette fonction peut rester vide, car le code ajouté dans *'security.yaml'* effectuera une redirection automatique 
 vers la page d'acueil du site (grâce à l'attribut 'target').
+
+
+On souhaite également que sur les tableaux de listing des différentes recettes, ce ne soit pas l'dientifiant de l'auteur 
+mais son adresse mail qui soit affichée. Pour cela, on peut ajouter la méthode magique ``__toString`` dans l'entité "User" :
+```php
+public function __toString()
+{
+    return $this->email;
+}
+```
+
+Cependant, le tri de la colone s'effetue toujours selon l'ordre des identifiants. Pour résoudre ce problème, on a besoin d'une 
+fonction qui convertisse la demande de tri sur la colonne 'Auteur' (représentée par ``$searchDto->getSort()['author']``)
+en la requête SQL :
+```sql
+SELECT entity FROM Recipe entity
+LEFT JOIN entity.author author
+ORDER BY author.email ASC
+```
+Ainsi, la fonction permettantd e réaliser ceci (qui est à ajouter dans le controlleur du CRUD de recettes) est la suivante : 
+```php
+ public function createIndexQueryBuilder(SearchDto $searchDto,EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
+{
+    $qb = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
+
+    if ($searchDto->getSort() && isset($searchDto->getSort()['author'])) {
+        $qb->orderBy('author.email', $searchDto->getSort()['author']);
+    }
+
+    return $qb;
+}
+```
+

@@ -19,7 +19,9 @@ class UserCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm(),
+            IdField::new('id')
+                ->hideOnIndex()        // "hideOnIndex" --> permet de masquer ce champ sur les tableaux de listing
+                ->hideOnForm(),        // "hideOnForm"--> permet de masquer ce champ sur les formulaires
             EmailField::new('email', 'Adresse e-mail'),
             ArrayField::new('roles', 'Rôles'),
             TextField::new('password', 'Mot de passe')->hideOnIndex(),
