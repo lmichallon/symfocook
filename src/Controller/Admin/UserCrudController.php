@@ -20,8 +20,8 @@ class UserCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')
-                ->hideOnIndex()        // "hideOnIndex" --> permet de masquer ce champ sur les tableaux de listing
-                ->hideOnForm(),        // "hideOnForm"--> permet de masquer ce champ sur les formulaires
+                ->hideOnIndex()        // "hideOnIndex" --> allows to hide this field on listing arrays
+                ->hideOnForm(),        // "hideOnForm"--> allows to hide this field on forms
             EmailField::new('email', 'Adresse e-mail'),
             ArrayField::new('roles', 'Rôles'),
             TextField::new('password', 'Mot de passe')->hideOnIndex(),

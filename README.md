@@ -24,12 +24,14 @@ Une fois un résultat satisfaisant obtenu, et la bonne corrrepondance entre les 
 *"src/DataFixtures/AppFixtures.php"* plusieurs fonctions permettant de d'insérer ces données dans la base de données à partir des fichiers JSON.
 
 ### 2) Mise en place du Back-Office pour les utilisateurs admins *(par Louis Cauvet)*
+#### Ajout du bundle EasyAdmin au projet
 On installe le Bundle "EasyAdminBundle", qui va nous permettre de générer des CRUD pour les recettes et les utilisateurs..
 Pour cela, on l'installe via Composer avec la commande ``composer require easycorp/easyadmin-bundle``.
 
 On exécute ensuite la commande ``php bin/console make:admin:dashboard`` afin de générer un controlleur d'administration 
 (que l'on retrouve dans *'src/Controller/Admin/DashboardBackOfficeController*).
 
+#### Configuration des routes du Back-Office
 On active ensuite un chargeur de route personnalisé dans notre application, en créant le fichier *'config/routes/easyadmin.yaml'*
 et en y insérant le code :
 ```yaml
@@ -51,6 +53,8 @@ On indique ensuite que lors de l'arrivée d'un admin dans le back-office, il doi
          return $this->redirect($adminUrlGenerator->setController(RecipeCrudController::class)->generateUrl());
     }
 ```
+
+#### Ajout des restrictions d'accès au BO
 ⚠️ On choisit de laisser l'url par défaut pour la route permettant d'accéder au Back-Office, à savoir "/admin".
 Ainsi, dans "*config/packages/security.yaml*", on ajoute la ligne suivante :
 ```yaml
@@ -60,6 +64,7 @@ security:
 ```
 qui permet de limiter l'accès à toutes les pages du Back-office (dont l'url commencera donc par "/admin") uniquement aux utilisateurs dont le rôle est "ROLE_ADMIN".
 
+#### Paramétrage de l'interface du BO
 On ajoute ensuite la configuration de notre back-office dans les fonctions du controlleur, conformément aux différentes options
 qui nous sont présentées dans la doc du Bundle :
 ```php
@@ -73,14 +78,15 @@ public function configureMenuItems(): iterable
 {
     yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
 
-    yield MenuItem::section('Utilisateurs');
+    yield MenuItem::section('Gestion des utilisateurs');
     yield MenuItem::linkToCrud('Utilisateurs', 'fa fa-user', User::class);
 
-    yield MenuItem::section('Recettes');
+    yield MenuItem::section('Gestion des recettes');
     yield MenuItem::linkToCrud('Recettes', 'fa fa-utensils', Recipe::class);
 }
 ```
 
+#### Création des CRUD pour les recettes et les utilisateurs
 On peut ensuite générer un contrôleur pour le CRUD de l'entité 'Recipe', avec la commande ``php bin/console make:admin:crud``.
 On fait de même pour le CRUD de l'entité 'User'.
 
@@ -90,9 +96,11 @@ Il faut alors modifier les fonctions "configureFields" de ces contrôleurs pour 
 public function configureFields(string $pageName): iterable 
 {
     return [
-        IdField::new('id')->hideOnForm(),        // "hideOnForm"--> permet de masquer ce champ sur les formulaires
+        IdField::new('id')
+            ->hideOnIndex()        // "hideOnIndex" --> allows to hide this field on listing arrays
+            ->hideOnForm(),        // "hideOnForm"--> allows to hide this field on forms        
         TextField::new('title', 'Titre'),
-        TextareaField::new('content', 'Contenu')->setSortable(false),      // "setSortable(false)"--> permet d'empêcher le tri
+        TextareaField::new('content', 'Déroulé de la recette')->setSortable(false),      // "setSortable(false)"--> allows to prevent sorting
         NumberField::new('duration', 'Durée (en minutes)'),
         ChoiceField::new('difficulty', 'Difficulté')
             ->setChoices([
@@ -106,6 +114,7 @@ public function configureFields(string $pageName): iterable
 }
 ```
 
+#### Gestion de la déconnexion au BO
 On souhaite ajouter un lien de déconnexion dans le menu du Back-Office. Pour cela, on ajoute la ligne suivante :
 ```php
 yield MenuItem::linkToLogout('Déconnexion', 'fa fa-door-open');
@@ -131,7 +140,7 @@ public function logout(): void
 ⚠️ Cette fonction peut rester vide, car le code ajouté dans *'security.yaml'* effectuera une redirection automatique 
 vers la page d'acueil du site (grâce à l'attribut 'target').
 
-
+#### Modification de l'affichage des clés étrangères dans les tableaux du BO
 On souhaite également que sur les tableaux de listing des différentes recettes, ce ne soit pas l'dientifiant de l'auteur 
 mais son adresse mail qui soit affichée. Pour cela, on peut ajouter la méthode magique ``__toString`` dans l'entité "User" :
 ```php
@@ -160,6 +169,93 @@ Ainsi, la fonction permettantd e réaliser ceci (qui est à ajouter dans le cont
     }
 
     return $qb;
+}
+```
+
+#### Traduction des champs natifs de EasyAdmin
+Actuellement, les champs liés aux fonctionnalités natives de EasyAdmin s'affichent en anglais ("Add", "Edit", "Delete", "Search", Previous", "Next", "Results"...).
+On souhaite donc paramétrer la langue du bundle en français pour que ces champs soient traduits.
+Pour cela, il faut modifier la langue par défaut du projet, dans *"config/packages/translation.yaml*:
+```yaml
+framework:
+    default_locale: fr
+```
+⚠️ On peut laisser "en" pour la partie "fallbacks" de ce fichier, afin que les chaînes dont la traduction française n'est pas trouvée s'affichent en anglais par défaut.
+
+Cependant, les noms des entités sont toujours en anglais, puisqu'elles ont été définies ainsi dans le code ("Recipe", "User").
+<span style="color: #FF0000">A effectuer !</span>
+
+
+#### Rectification/Personnalisation du formulaire de création de recette
+Lorsqu'on essaie de créer une nouvelle recette, on rencontre une erreur car le champ "Difficulté" du formulaire se base sur 
+une valeur textuelle au lieu d'une valeur que l'on retrouve dans l'énumération "Difficulty".
+Pour corriger ceci tout en continuant d'avoir une valeur textuelle affichée dans les tableaux de listing de recettes, il nous faut dissocier les 2 cas dans la définition des champs
+du contrôleur du CRUD de recettes, en remplaçant ceci :
+```php
+ChoiceField::new('difficulty', 'Difficulté')
+->setChoices([
+    'Facile' => Difficulty::EASY,
+    'Moyen' => Difficulty::MEDIUM,
+    'Difficile' => Difficulty::HARD,
+]),
+```
+par ceci :
+```php
+// Difficulty field only for forms
+ChoiceField::new('difficulty', 'Difficulté')
+    ->setChoices([
+        'Facile' => Difficulty::EASY,
+        'Moyen' => Difficulty::MEDIUM,
+        'Difficile' => Difficulty::HARD,
+    ])
+    ->onlyOnForms(),
+
+// Difficulty field only for tables
+ChoiceField::new('difficulty', 'Difficulté')
+    ->setChoices([
+        'Facile' => Difficulty::EASY->value,
+        'Moyen' => Difficulty::MEDIUM->value,
+        'Difficile' => Difficulty::HARD->value,
+    ])
+    ->onlyOnIndex(),
+```
+
+Autre souci, lors de la création d'une recette via le formulaire, il y a aussi par défaut un champ "Auteur" permettant d'indiquer
+quel utilisateur est l'auteur de cette recette, alors qu'on souhaite que la recette fraîchement créée soit automatiquement associée 
+à l'admin connecté. Pour ceci, on va masquer le champ "Auteur" des formulaires, dans la fonction "configureFields" du contrôleur de CRUD de recettes :
+```php
+AssociationField::new('author', 'Auteur')->hideOnForm(),
+```
+Il nous faut aussi définir une surcharge de la fonction 'persistEntity' du contrôleur, afin de capter l'utilisateur connecté et de le définir 
+comme étant l'auteur de la recette dans la base de données.
+Pour cela :
+```php
+ public function persistEntity(EntityManagerInterface $entityManager, $entity): void
+    {
+        // Inserting the connected admin user as author of new recipe
+        if ($entity instanceof Recipe) {
+            $connectedUser = $this->security->getUser();
+
+            if ($connectedUser) {
+                $entity->setAuthor($connectedUser);
+            } else {
+                throw new \RuntimeException('Impossible de reconnaître l\'utilisateur connecté !');
+            }
+        }
+
+        parent::persistEntity($entityManager, $entity);
+    }
+```
+*(Source : https://symfony.com/bundles/EasyAdminBundle/current/crud.html#creating-persisting-and-deleting-entities)*
+
+⚠️On a besoin d'injecter la dépendance "Security" dans le constructeur de la classe, 
+car c'est elle qui nous permet de récupérer ensuite l'utilisateur connecté (via la variable ``$security``) :
+```php
+private Security $security;
+
+public function __construct(Security $security)
+{
+    $this->security = $security;
 }
 ```
 

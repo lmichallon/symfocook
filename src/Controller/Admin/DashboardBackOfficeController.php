@@ -30,10 +30,10 @@ class DashboardBackOfficeController extends AbstractDashboardController
     {
         yield MenuItem::linkToLogout('Déconnexion', 'fa fa-door-open');
 
-        yield MenuItem::section('Utilisateurs');
+        yield MenuItem::section('Gestion des utilisateurs');
         yield MenuItem::linkToCrud('Utilisateurs', 'fa fa-user', User::class);
 
-        yield MenuItem::section('Recettes');
+        yield MenuItem::section('Gestion des recettes');
         yield MenuItem::linkToCrud('Recettes', 'fa fa-utensils', Recipe::class);
     }
 
