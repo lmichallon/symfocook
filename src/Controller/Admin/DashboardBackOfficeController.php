@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Recipe;
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -18,6 +19,11 @@ class DashboardBackOfficeController extends AbstractDashboardController
     {
          $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
          return $this->redirect($adminUrlGenerator->setController(RecipeCrudController::class)->generateUrl());
+    }
+
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(): void
+    {
     }
 
     public function configureDashboard(): Dashboard
@@ -35,10 +41,5 @@ class DashboardBackOfficeController extends AbstractDashboardController
 
         yield MenuItem::section('Gestion des recettes');
         yield MenuItem::linkToCrud('Recettes', 'fa fa-utensils', Recipe::class);
-    }
-
-    #[Route('/logout', name: 'app_logout')]
-    public function logout(): void
-    {
     }
 }

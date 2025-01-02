@@ -40,7 +40,7 @@ class Recipe
     /**
      * @var Collection<int, RecipeIngredient>
      */
-    #[ORM\OneToMany(targetEntity: RecipeIngredient::class, mappedBy: 'recipe', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: RecipeIngredient::class, mappedBy: 'recipe', cascade: ['persist'], orphanRemoval: true)]
     private Collection $ingredients;
 
     public function __construct()

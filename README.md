@@ -259,3 +259,22 @@ public function __construct(Security $security)
 }
 ```
 
+#### Ajout de la liste des ingrédients pour chaque recette
+Dans notre tableau de listing des recettes, il nous manque également le détail des ingrédients et des quantités nécéssaires 
+pour chaque recette, puisque ces données proviennent d'autres tables qui 'RecipeIngredient' (pour la quantité de chaque ingrédient) et 'Ingredient' (pour le nom des ingrédients).   
+Pour le rajouter au tableau, il faut donc définir un nouveau champ dans la fonction 'configureFields' du contrôleur de CRUD de recettes, à savoir :
+```php
+CollectionField::new('ingredients', 'Détail des ingrédients')
+    ->formatValue(function ($value,$entity) {
+        return implode(', ', $entity->getIngredients()->map(function ($recipeIngredient) {
+            return $recipeIngredient->getIngredient()->getName() . ' (' . $recipeIngredient->getQuantity() . ')';
+        })->toArray());
+    })
+    ->onlyOnIndex(),
+```
+⚠️Ces lignes permettent de récupérer les données que l'on désire grâce aux fonctions ``getIngredients`` de l'entité 'Recipe', et 
+``getIngredient`` de l'entité 'RecipeIngrédient', qui font un travail équivalent à des jointures SQL pour récupérer les données d'autres entités/tables
+vers celle dans laquelle on se situe (à savoir "Recipe").  Elle permet également de définir le format d'affichage des données dans la cellule de tableau.
+
+
+#### Inclusion de la liste des ingrédients dans les formulaires de création/de modification de recette

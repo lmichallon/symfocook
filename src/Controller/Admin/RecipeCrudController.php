@@ -2,18 +2,23 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Ingredient;
 use App\Entity\Recipe;
 use App\Entity\User;
 use App\Enum\Difficulty;
+use App\Form\RecipeIngredientType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Asset;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
@@ -62,12 +67,25 @@ class RecipeCrudController extends AbstractCrudController
                 ])
                 ->onlyOnIndex(),
 
-            AssociationField::new('author', 'Auteur')->hideOnForm(),
             AssociationField::new('category', 'Catégorie'),
+            AssociationField::new('author', 'Auteur')->hideOnForm(),
+
+            CollectionField::new('ingredients', 'Détail des ingrédients')
+                ->formatValue(function ($value,$entity) {
+                    return implode(', ', $entity->getIngredients()->map(function ($recipeIngredient) {
+                        return $recipeIngredient->getIngredient()->getName() . ' (' . $recipeIngredient->getQuantity() . ')';
+                    })->toArray());
+                })
+                ->onlyOnIndex(),
+
+            CollectionField::new('ingredients', 'Détail des ingrédients')
+                ->setEntryType(RecipeIngredientType::class)           // Personalized form
+                ->onlyOnForms(),
+
         ];
     }
 
-    
+
     // Allows to display textual values instead of id for foreign keys' fields
     public function createIndexQueryBuilder(SearchDto $searchDto,EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
     {
@@ -89,26 +107,34 @@ class RecipeCrudController extends AbstractCrudController
     public function persistEntity(EntityManagerInterface $entityManager, $entity): void
     {
         // Inserting the connected admin user as author of new recipe
-        if ($entity instanceof Recipe) {
-            $connectedUser = $this->security->getUser();
-
-            if ($connectedUser) {
-                $entity->setAuthor($connectedUser);
-            } else {
-                throw new \RuntimeException('Impossible de reconnaître l\'utilisateur connecté !');
-            }
-        }
-
-        // For testing with a predefined user (the one with ID number 1)
 //        if ($entity instanceof Recipe) {
-//            $defaultAuthor = $entityManager->getRepository(User::class)->find(1);
+//            $connectedUser = $this->security->getUser();
 //
-//            if ($defaultAuthor) {
-//                $entity->setAuthor($defaultAuthor);
+//            if ($connectedUser) {
+//                $entity->setAuthor($connectedUser);
 //            } else {
-//                throw new \RuntimeException('Utilisateur de test introuvable.');
+//                throw new \RuntimeException('Impossible de reconnaître l\'utilisateur connecté !');
 //            }
 //        }
+
+        // For testing with a predefined user (the one with ID number 1)
+        if ($entity instanceof Recipe) {
+            $defaultAuthor = $entityManager->getRepository(User::class)->find(1);
+
+            if ($defaultAuthor) {
+                $entity->setAuthor($defaultAuthor);
+            } else {
+                throw new \RuntimeException('Utilisateur de test introuvable.');
+            }
+
+//            foreach ($entity->getIngredients() as $recipeIngredient) {
+//                $ingredientName = $recipeIngredient->getIngredient();
+//
+//                $ingredient = $entityManager->getRepository(Ingredient::class)->findOneBy(['name' => $ingredientName]);
+//
+//                $recipeIngredient->setIngredient($ingredient);
+//            }
+        }
 
         parent::persistEntity($entityManager, $entity);
     }
