@@ -126,14 +126,6 @@ class RecipeCrudController extends AbstractCrudController
             } else {
                 throw new \RuntimeException('Utilisateur de test introuvable.');
             }
-
-//            foreach ($entity->getIngredients() as $recipeIngredient) {
-//                $ingredientName = $recipeIngredient->getIngredient();
-//
-//                $ingredient = $entityManager->getRepository(Ingredient::class)->findOneBy(['name' => $ingredientName]);
-//
-//                $recipeIngredient->setIngredient($ingredient);
-//            }
         }
 
         parent::persistEntity($entityManager, $entity);

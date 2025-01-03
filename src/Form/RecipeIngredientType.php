@@ -11,6 +11,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class RecipeIngredientType extends AbstractType
 {
@@ -24,13 +25,6 @@ class RecipeIngredientType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $ingredients = $this->entityManager->getRepository(Ingredient::class)->findAll();
-
-        $ingredientChoices = [];
-        foreach ($ingredients as $ingredient) {
-            $ingredientChoices[$ingredient->getName()] = $ingredient->getName();
-        }
-
         $builder
             ->add('ingredient', EntityType::class, [
                 'class' => Ingredient::class,
@@ -39,12 +33,19 @@ class RecipeIngredientType extends AbstractType
                 'placeholder' => 'Choisissez un ingrédient',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('i')
-                        ->orderBy('i.name', 'ASC');                      // Sorting in alphabetical order
+                        ->orderBy('i.name', 'ASC');             // Sorting in alphabetical order
                 },
                 'required' => true,
+                'constraints' => [
+                    new NotNull(['message' => 'Vous devez sélectionner un ingrédient.']),
+                ],
             ])
             ->add('quantity', TextType::class, [
                 'label' => 'Quantité',
+                'required' => true,
+                'constraints' => [
+                    new NotNull(['message' => 'Vous devez sélectionner une quantité.']),
+                ],
             ]);
     }
 

@@ -277,4 +277,50 @@ CollectionField::new('ingredients', 'Détail des ingrédients')
 vers celle dans laquelle on se situe (à savoir "Recipe").  Elle permet également de définir le format d'affichage des données dans la cellule de tableau.
 
 
-#### Inclusion de la liste des ingrédients dans les formulaires de création/de modification de recette
+#### Inclusion de la liste des ingrédients dans les formulaires de création/de modification de recette (partie assistée par l'IA)
+Pour pouvoir indiquer la liste des ingrédients lors de la création ou de la modification d'une recette, il faut que l'on ajoute de nouveaux champs aux formulaires.
+Cependant, la relation complexe OneToMany établie entre "Recipe" et "RecipeIngredient" implique de devoir mettre en place un formulaire personnalisé,
+avec un répéteur permettant de saisir autant d'ingérdients que nécéssaire. Ainsi, on définit dans la fonction
+"ConfigureField" du contrôleur du CRUD de recettes le champ personnalisé suivant :
+```php
+ CollectionField::new('ingredients', 'Détail des ingrédients')
+    ->setEntryType(RecipeIngredientType::class)           // Personalized form
+    ->onlyOnForms(),
+```
+qui correspond à une nouvelle classe "src/Form/RecipeIngredientType.php", dans laquelle on retourve la fonction suivante :
+```php
+public function buildForm(FormBuilderInterface $builder, array $options): void
+{
+    $builder
+        ->add('ingredient', EntityType::class, [
+            'class' => Ingredient::class,
+            'choice_label' => 'name',
+            'label' => 'Ingrédient',
+            'placeholder' => 'Choisissez un ingrédient',
+            'query_builder' => function (EntityRepository $er) {
+                return $er->createQueryBuilder('i')
+                    ->orderBy('i.name', 'ASC');           // Sorting in alphabetical order
+            },
+            'required' => true,
+            'constraints' => [
+                new NotNull(['message' => 'Vous devez sélectionner un ingrédient.']),
+            ],
+        ])
+        ->add('quantity', TextType::class, [
+            'label' => 'Quantité',
+            'required' => true,
+            'constraints' => [
+                new NotNull(['message' => 'Vous devez sélectionner une quantité.']),
+            ],
+        ]);
+}
+```
+⚠️Cette fonction permet de récupérer tous les ingrédients disponibles dans la base de données, et de les transformer en une 
+liste de choix (triée par ordre alphabétique), accompagnée d'un champ texte qui indique la quantité associée à l'ingrédient choisi.
+On a ajouté un contrainte qui oblige à renseigner une quantité si un ingrédient est sélectionné, et inversement.
+
+<span style="color: #FF0000">Evolution possible :</span> Ce qui aurait été encore mieux, c'est que l'utilisateur se voit proposer
+la liste de tous les ingrédients dans la base de données, mais qu'il saisisse librement du texte dans un champ afin que les propositions 
+d'ingrédients se réduisent au fur et à mesure de la saisie (comme pour une datalist).   
+Ca aurait notamment permis à un utilisateur de renseigner un nouvel ingrédient à ajouter à la base de données dans le cas
+où aucun de la liste ne correspond à ses besoins.
