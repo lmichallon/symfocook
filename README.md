@@ -259,7 +259,7 @@ public function __construct(Security $security)
 }
 ```
 
-#### Ajout de la liste des ingrédients pour chaque recette
+#### Affichage de la liste des ingrédients pour chaque recette
 Dans notre tableau de listing des recettes, il nous manque également le détail des ingrédients et des quantités nécéssaires 
 pour chaque recette, puisque ces données proviennent d'autres tables qui 'RecipeIngredient' (pour la quantité de chaque ingrédient) et 'Ingredient' (pour le nom des ingrédients).   
 Pour le rajouter au tableau, il faut donc définir un nouveau champ dans la fonction 'configureFields' du contrôleur de CRUD de recettes, à savoir :
@@ -277,7 +277,7 @@ CollectionField::new('ingredients', 'Détail des ingrédients')
 vers celle dans laquelle on se situe (à savoir "Recipe").  Elle permet également de définir le format d'affichage des données dans la cellule de tableau.
 
 
-#### Inclusion de la liste des ingrédients dans les formulaires de création/de modification de recette (partie assistée par l'IA)
+#### Inclusion de la liste des ingrédients dans les formulaires de création/de modification de recette (partie assistée par IA)
 Pour pouvoir indiquer la liste des ingrédients lors de la création ou de la modification d'une recette, il faut que l'on ajoute de nouveaux champs aux formulaires.
 Cependant, la relation complexe OneToMany établie entre "Recipe" et "RecipeIngredient" implique de devoir mettre en place un formulaire personnalisé,
 avec un répéteur permettant de saisir autant d'ingérdients que nécéssaire. Ainsi, on définit dans la fonction
@@ -315,7 +315,7 @@ public function buildForm(FormBuilderInterface $builder, array $options): void
         ]);
 }
 ```
-⚠️Cette fonction permet de récupérer tous les ingrédients disponibles dans la base de données, et de les transformer en une 
+⚠️ Cette fonction permet de récupérer tous les ingrédients disponibles dans la base de données, et de les transformer en une 
 liste de choix (triée par ordre alphabétique), accompagnée d'un champ texte qui indique la quantité associée à l'ingrédient choisi.
 On a ajouté un contrainte qui oblige à renseigner une quantité si un ingrédient est sélectionné, et inversement.
 
@@ -324,3 +324,320 @@ la liste de tous les ingrédients dans la base de données, mais qu'il saisisse 
 d'ingrédients se réduisent au fur et à mesure de la saisie (comme pour une datalist).   
 Ca aurait notamment permis à un utilisateur de renseigner un nouvel ingrédient à ajouter à la base de données dans le cas
 où aucun de la liste ne correspond à ses besoins.
+
+#### Rectification/Personnalisation du formulaire de création d'utilisateur 
+Pour le formulaire de création d'un utilisateur, on souhaite qu'il y ai une case à cocher qui permette de choisir si l'utilisateur est
+un admin ou non. Pour cela, on ajoute le champ suivant dans la fonction "configureFields" du contrôleur du CRUD d'utilisateur :
+```php
+// Display roles' list in array
+ArrayField::new('roles', 'Rôles')
+    ->onlyOnIndex(),
+
+// Display roles' choice in forms
+BooleanField::new('isAdmin', 'Utilisateur administrateur')
+    ->renderAsSwitch(false)
+    ->onlyOnForms(),
+```
+⚠️ On définit 2 champs différents, un tableau sous qui affichera tous les rôles de l'utilisateur sur la vue de liste d'utilisateur,
+et une checkbox pour les formulaires.
+
+Pour associer les bons rôles au nouvel utilisateur crée, on ajoute la fonction suivante dans le code de l'entité "User" :
+```php
+public function setIsAdmin(bool $isAdmin): self
+{
+    if ($isAdmin) {
+        if (!in_array('ROLE_ADMIN', $this->roles, true)) {
+            $this->roles[] = 'ROLE_ADMIN';
+        }
+    } else {
+        $this->roles = array_filter($this->roles, fn($role) => $role !== 'ROLE_ADMIN');
+    }
+
+    // Checking than "ROLE_USER" is always present
+    if (!in_array('ROLE_USER', $this->roles, true)) {
+        $this->roles[] = 'ROLE_USER';
+    }
+
+    return $this;
+}
+```
+Ce code permet d'attribuer le rôle ``ROLE_ADMIN`` uniquement si la case du formulaire est cochée, et également à attribuer le 
+rôle ``ROLE_USER`` quoi qu'il arrive.
+
+#### Ajout de vérifications sur les champs
+Pour ajouter des vérifications supplémentaires et des messages d'erreurs personalisés sur un champ comme par exemple le mot de passe,
+il faut les définir au niveau de la proprété correspondante dans le code de l'entité :
+```php
+#[ORM\Column]
+#[NotBlank(message: 'Le mot de passe ne peut pas être vide.')]
+#[Length(
+    min: 8,
+    minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.',
+)]
+#[Regex(
+    pattern: '/[A-Z]/',
+    message: 'Le mot de passe doit contenir au moins une lettre majuscule.'
+)]
+#[Regex(
+    pattern: '/[a-z]/',
+    message: 'Le mot de passe doit contenir au moins une lettre minuscule.'
+)]
+#[Regex(
+    pattern: '/\d/',
+    message: 'Le mot de passe doit contenir au moins un chiffre.'
+)]
+#[Regex(
+    pattern: '/[\W_]/',
+    message: 'Le mot de passe doit contenir au moins un caractère spécial (par exemple : ! @ # $ % ^ & *).'
+)]
+private ?string $password = null;
+```
+Il faut également penser à activer la validation d'entité dans le fichier de configuration "config/packages/validator.yaml" :
+```yaml
+framework:
+    validation:
+        enable_attributes: true
+```
+Ainsi, si la saisie d'un champ ne correspond pas aux critères indiqués, le message d'erreur associé au critère s'affichera en dessous 
+du champ, et la validation du formulaire sera bloquée.
+(source : https://symfony.com/doc/current/reference/constraints.html)
+
+⚠️ De la même manière, on peut par exemple bloquer la validation du formulaire de création d'utilisateur si l'adresse mail renseignée.
+est déja associée à un compte dans la base de données :
+```php
+#[UniqueEntity(
+    fields: ['email'],
+    message: 'Cette adresse e-mail est déjà utilisée. Veuillez en choisir une autre.'
+)]
+```
+
+#### Modification du formulaire de modification d'un utilisateur (partie assistée par IA)
+Pour le formulaire de modification d'un utilisateur, nous souhaitons que le champ "Adresse mail" ne soit pas modifiable, 
+et qu'à la place du champ "Mot de passe", on retrouve un bouton qui peremtte de réinitialiser le mot de passe de l'utilisateur en lui
+envoyant un mail avec un lein vers un formulaire sur lequel il pourra saisir son nouveau mot de passe.
+
+Pour cela, on définit une structure de formulaire différente dans la fonction ``configureFields`` lorsque la page est destinée à la modification :
+```php
+if ($pageName === Crud::PAGE_EDIT) {
+    return [
+        IdField::new('id')->hideOnForm(),
+        TextField::new('email', 'Adresse e-mail')
+            ->setFormTypeOption('disabled', true),       // Make the field unmodifiable
+
+        // Display roles' choice in forms
+        BooleanField::new('isAdmin', 'Utilisateur administrateur')
+            ->renderAsSwitch(false)
+            ->onlyOnForms(),
+    ];
+}
+```
+Pour ajouter le fameux bouton qui déclanchera l'envoi d'un mail de réinitialisation du mot de passe à l'utilisateur concerné, on utilise
+la fonction "configureActions" du même contrôleur :
+```php
+ // Allows to add a custom cta for reset user's password
+public function configureActions(Actions $actions): Actions
+{
+    $resetPassword = Action::new('resetPassword', 'Réinitialiser le mot de passe')
+        ->linkToCrudAction('sendPasswordResetEmail')
+        ->setCssClass('btn btn-primary');
+
+    return $actions->add(Crud::PAGE_EDIT, $resetPassword);
+}
+```
+On définit également l'action liée au clic sur ce bouton (avec ``linkToCrudAction``) dans ce contrôleur : 
+```php
+// Sending a mail to user with a link for reset his password
+public function sendPasswordResetEmail(AdminContext $context): Response
+{
+    // Getting the user's id concerned by the password reset
+    $entityId = $context->getRequest()->query->get('entityId');
+
+    // Checking if the user's id was found in database
+    if (!$entityId) {
+        $this->addFlash('danger', 'ID d\'utilisateur manquant ou inconnu !.');
+        return $this->redirect(
+            $this->adminUrlGenerator
+                ->setController(UserCrudController::class)
+                ->setAction(Crud::PAGE_INDEX)
+                ->generateUrl()
+        );
+    }
+
+    // Getting the user thanks to the EntityManager
+    $user = $this->entityManager->getRepository(User::class)->find($entityId);
+
+    // Checking if the user's datas were found in database
+    if (!$user) {
+        $this->addFlash('danger', 'Utilisateur introuvable.');
+        return $this->redirect(
+            $this->adminUrlGenerator
+                ->setController(UserCrudController::class)
+                ->setAction(Crud::PAGE_INDEX)
+                ->generateUrl()
+        );
+    }
+
+    // Generating a reset token (valid for 2 hours)
+    $resetToken = Uuid::uuid4()->toString();
+    $user->setResetPasswordToken($resetToken);
+    $user->setResetPasswordExpiresAt(new \DateTimeImmutable('+2 hour'));
+
+    // Registering user's reset token in database
+    $this->entityManager->persist($user);
+    $this->entityManager->flush();
+
+    // Generating the reset link
+    $resetLink = $this->urlGenerator->generate('app_reset_password', [
+        'token' => $resetToken,
+    ], UrlGeneratorInterface::ABSOLUTE_URL);
+
+    // Sending the reset email to the user
+    $email = (new Email())
+        ->from('no-reply@symfocook.com')
+        ->to($user->getEmail())
+        ->subject('Réinitialisation de votre mot de passe')
+        ->html("<p>Bonjour,</p><br>
+            <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
+            <a href='$resetLink'>Réinitialiser mon mot de passe</a><br><br>
+            <p>Belle journée,</p>
+            <p>L'équipe Symfocook</p>");
+
+    $this->mailer->send($email);
+
+    // Redirects the admin to the user listing page with a message indicating that the email has been sent successfully.
+    $this->addFlash('success', 'Email de réinitialisation envoyé avec succès.');
+    return $this->redirect(
+        $this->adminUrlGenerator
+            ->setController(UserCrudController::class)
+            ->setAction(Crud::PAGE_INDEX)
+            ->generateUrl()
+    );
+}
+```
+Cette fonction à notamment pour rôle de récupérer les données de l'utilisateur concerné, y ajouter un token de réinitialisation et 
+une date de péremption pour ce token afin de les stocker en base de données, puis de générer et d'envoyer un mail contenant le lien
+vers la page de réinitialisation de mot de passe.
+
+⚠️ Il est donc nécéssaire de créer 2 nouveaux attributs pour l'entité "User", afin de stcoker un token de réinitialisation et sa date de péremption :
+```php
+#[ORM\Column(nullable: true)]
+private ?string $resetPasswordToken = null;
+
+#[ORM\Column(type: 'datetime_immutable', nullable: true)]
+private ?\DateTimeImmutable $resetPasswordExpiresAt = null;
+```
+
+Le lien du mail redirige vers la route du contrôleur suivant, que l'on crée dans "src/Controller/Admin/ResetUserPasswordController.php" :
+```php
+// Resetting the user's password using a custom form
+#[Route('/reset-password/{token}', name: 'app_reset_password')]
+public function resetPassword(
+    string $token,
+    Request $request,
+    EntityManagerInterface $entityManager,
+    UserPasswordHasherInterface $passwordHasher
+): Response {
+    // Getting user based on his reset token
+    $user = $entityManager->getRepository(User::class)->findOneBy(['resetPasswordToken' => $token]);
+
+    // Handling any errors that may occur
+    if (!$user || $user->getResetPasswordExpiresAt() < new \DateTimeImmutable()) {
+        $this->addFlash('error', 'Le lien de réinitialisation est invalide ou expiré.');
+        return $this->redirectToRoute('app_login');
+    }
+
+    // Creating a custom form
+    $form = $this->createForm(ResetPasswordType::class, null, [
+        'csrf_token_id' => 'reset_password',
+    ]);
+    $form->handleRequest($request);
+
+    // Checking and hashing the new password when the custom form is submitted
+    if ($form->isSubmitted() && $form->isValid()) {
+        $data = $form->getData();
+        $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
+        $user->setPassword($hashedPassword);
+        $user->setResetPasswordToken(null);
+        $user->setResetPasswordExpiresAt(null);
+
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Votre mot de passe a été modifié avec succès.');
+
+        return $this->redirectToRoute('app_login');    
+    }
+
+    // Calling the custom form's template
+    return $this->render('reset_password/reset.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+```
+Cette fonction checke que le token de l'utilisateur est le bon et est valide, pour génère un formulaire personalisé que l'on définit dans "src/Form/ResetPasswordType.php":
+```php
+// Personalizing a form which allows to change user's password if he asked it
+public function buildForm(FormBuilderInterface $builder, array $options): void
+{
+    $builder
+        ->add('password', PasswordType::class, [
+            'label' => 'Nouveau mot de passe',
+            'constraints' => [
+                new NotBlank([
+                    'message' => 'Le mot de passe ne peut pas être vide.',
+                ]),
+                new Length([
+                    'min' => 8,
+                    'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères.',
+                ]),
+                new Regex([
+                    'pattern' => '/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).+/',
+                    'message' => 'Votre mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.',
+                ]),
+            ],
+        ])
+        ->add('confirm_password', PasswordType::class, [
+            'label' => 'Confirmez le mot de passe',
+            'mapped' => false,
+            'constraints' => [
+                new NotBlank(),
+            ],
+        ])
+        ->add('_token', HiddenType::class, [
+            'data' => $options['csrf_token_id'] ?? 'reset_password',
+        ]);
+
+
+    // Cheching if the form fields' values are identicals for valid the password
+    $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+        $form = $event->getForm();
+
+        $password = $form->get('password')->getData();
+        $confirmPassword = $form->get('confirm_password')->getData();
+
+        if ($password !== $confirmPassword) {
+            $form->get('confirm_password')->addError(new FormError('Les mots de passe ne correspondent pas.'));
+        }
+    });
+}
+```
+On définit aussi un template "templates/reset_password/reset.html.twig" dans lequel afficher ce formulaire :
+```html
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Symfocook | Réinitialisation du mot de passe
+{% endblock %}
+
+{% block body %}
+    <h1>Réinitialiser le mot de passe</h1>
+    {{ form_start(form) }}
+    {{ form_row(form.password) }}
+    {{ form_row(form.confirm_password) }}
+    <button type="submit">Confirmer ce nouveau mot de passe</button>
+    {{ form_end(form) }}
+{% endblock %}
+```
+
+Ainsi, lorsque ce formulaire est soumis et que les conditions sur les champs sont validées, le nouveau mot de passe est hashé
+et les données liées au token sont supprimées, puis les données de l'utilisateur sont mises à jour dans la base de données, et il est redirigé sur
+la page de connexion.

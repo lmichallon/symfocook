@@ -17,21 +17,25 @@ class DashboardBackOfficeController extends AbstractDashboardController
     #[Route('/admin', name: 'admin')]
     public function index(): Response
     {
+         // Redirects immmediatly to managing recipes' interface
          $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
          return $this->redirect($adminUrlGenerator->setController(RecipeCrudController::class)->generateUrl());
     }
 
+    // User logout from back-office
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
     }
 
+    // Allows to configure dashboard's params
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
             ->setTitle('SymfoCook - Back Office');
     }
 
+    // Allows to configure dashboard's navmenu
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToLogout('Déconnexion', 'fa fa-door-open');

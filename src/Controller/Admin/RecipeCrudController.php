@@ -39,6 +39,7 @@ class RecipeCrudController extends AbstractCrudController
         return Recipe::class;
     }
 
+    // Allows to configure Recipe fields in array lists & forms
     public function configureFields(string $pageName): iterable
     {
         return [
