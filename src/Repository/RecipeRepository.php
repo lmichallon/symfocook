@@ -16,28 +16,32 @@ class RecipeRepository extends ServiceEntityRepository
         parent::__construct($registry, Recipe::class);
     }
 
-    //    /**
-    //     * @return Recipe[] Returns an array of Recipe objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     *  @param $category
+     * @return Recipe[] Returns an array of Recipe objects
+     */
+    public function findByCategory($category): array
+    {
+        $queryBuilder = $this->createQueryBuilder('r')
+            ->join('r.category', 'c')
+            ->setParameter('category', $category)
+            ->andWhere('c.name = :category');
 
-    //    public function findOneBySomeField($value): ?Recipe
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param $ingredient
+     * @return Recipe[] Returns an array of Recipe objects
+     */
+    public function findByIngredient($ingredient): array
+    {
+        $queryBuilder = $this->createQueryBuilder('r')
+            ->join('r.ingredients', 'ri')
+            ->join('ri.ingredient', 'i')
+            ->andWhere('i.name = :ingredient')
+            ->setParameter('ingredient', $ingredient);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
 }
