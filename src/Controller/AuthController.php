@@ -63,8 +63,6 @@ class AuthController extends AbstractController
             // Encode le mot de passe
             $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
 
-            $user->setRoles(['user']);
-
             // Sauvegarde de l'utilisateur
             $entityManager->persist($user);
             $entityManager->flush();

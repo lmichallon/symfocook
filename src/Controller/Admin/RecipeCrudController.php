@@ -108,15 +108,15 @@ class RecipeCrudController extends AbstractCrudController
     public function persistEntity(EntityManagerInterface $entityManager, $entity): void
     {
         // Inserting the connected admin user as author of new recipe
-//        if ($entity instanceof Recipe) {
-//            $connectedUser = $this->security->getUser();
-//
-//            if ($connectedUser) {
-//                $entity->setAuthor($connectedUser);
-//            } else {
-//                throw new \RuntimeException('Impossible de reconnaître l\'utilisateur connecté !');
-//            }
-//        }
+       if ($entity instanceof Recipe) {
+           $connectedUser = $this->security->getUser();
+
+           if ($connectedUser) {
+               $entity->setAuthor($connectedUser);
+           } else {
+               throw new \RuntimeException('Impossible de reconnaître l\'utilisateur connecté !');
+           }
+       }
 
         // For testing with a predefined user (the one with ID number 1)
         if ($entity instanceof Recipe) {
