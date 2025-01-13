@@ -1,0 +1,71 @@
+{# templates/recipe/ecrire_recette.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Écrire une recette{% endblock %}
+
+{% block body %}
+<div class="container mt-1">
+    <h1 class="text-center mb-3">Écrire une recette</h1>
+    {{ form_start(form, {'attr': {'class': 'recipe-form shadow p-4 rounded'}}) }}
+        <div class="mb-3">
+            {{ form_row(form.title, {'attr': {'class': 'form-control', 'placeholder': 'Titre de la recette'}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.content, {'attr': {'class': 'form-control', 'placeholder': 'Détails de la recette', 'rows': 3}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.duration, {'attr': {'class': 'form-control', 'placeholder': 'Durée en minutes'}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.difficulty, {'attr': {'class': 'form-select'}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.category, {'attr': {'class': 'form-select'}}) }}
+        </div>
+
+        <h3 class="text-center">Ingrédients</h3>
+        
+        <div id="ingredients" data-prototype="{{ form_widget(form.ingredients.vars.prototype)|e('html') }}">
+            <div class="row g-3" id="ingredients-container">
+                {% for ingredientForm in form.ingredients %}
+                    <div class="col-3">
+                        <div class="ingredient-group border rounded p-3 shadow-sm">
+                            {{ form_row(ingredientForm.ingredient, {'label': 'Ingrédient : ', 'attr': {'class': 'form-select ingredient-select'}}) }}
+                            {{ form_row(ingredientForm.quantity, {'label': 'Quantité : ', 'attr': {'class': 'form-control quantity-input'}}) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="row g-3 mt-3">
+            <div class="col-6">
+                <button type="button" id="add-ingredient" class="btn btn-succes w-100">Ajouter un ingrédient</button>
+            </div>
+            <div class="col-6">
+                <button class="btn btn-success w-100" type="submit">Soumettre</button>
+            </div>
+        </div>
+        {{ form_end(form) }}
+
+    <script>
+       document.getElementById('add-ingredient').addEventListener('click', function () {
+        const container = document.getElementById('ingredients-container');
+        const prototype = container.parentNode.dataset.prototype;
+        const index = container.children.length; 
+
+        const newForm = prototype.replace(/__name__/g, index);
+        const div = document.createElement('div');
+        div.classList.add('col-3'); 
+        div.innerHTML = `
+            <div class="ingredient-group">
+                ${newForm}
+            </div>
+        `;
+
+        container.appendChild(div); 
+    });
+    </script>
+</div>
+{% endblock %}
