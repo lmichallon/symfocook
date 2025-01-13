@@ -1,0 +1,14 @@
+[
+  { "id": 1, "name": "Entrées" },
+  { "id": 2, "name": "Plats" },
+  { "id": 3, "name": "Desserts" },
+  { "id": 4, "name": "Soupes" },
+  { "id": 5, "name": "Salades" },
+  { "id": 6, "name": "Sucreries" },
+  { "id": 7, "name": "Boissons" },
+  { "id": 8, "name": "Petit déjeuner" },
+  { "id": 9, "name": "Végétarien" },
+  { "id": 10, "name": "Vegan" },
+  { "id": 11, "name": "Cuisine du monde" },
+  { "id": 12, "name": "Sauces et condiments" }
+]
