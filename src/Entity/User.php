@@ -6,12 +6,22 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(
+    fields: ['email'],
+    message: 'Cette adresse e-mail est déjà utilisée. Veuillez en choisir une autre.'
+)]
+
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -20,6 +30,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[NotBlank(message: 'Veuillez renseigner une adresse e-mail.')]
+    #[Email(message: 'Veuillez saisir une adresse e-mail valide.')]
     private ?string $email = null;
 
     /**
@@ -32,7 +44,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[NotBlank(message: 'Le mot de passe ne peut pas être vide.')]
+    #[Length(
+        min: 8,
+        minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.',
+    )]
+    #[Regex(
+        pattern: '/[A-Z]/',
+        message: 'Le mot de passe doit contenir au moins une lettre majuscule.'
+    )]
+    #[Regex(
+        pattern: '/[a-z]/',
+        message: 'Le mot de passe doit contenir au moins une lettre minuscule.'
+    )]
+    #[Regex(
+        pattern: '/\d/',
+        message: 'Le mot de passe doit contenir au moins un chiffre.'
+    )]
+    #[Regex(
+        pattern: '/[\W_]/',
+        message: 'Le mot de passe doit contenir au moins un caractère spécial (par exemple : ! @ # $ % ^ & *).'
+    )]
     private ?string $password = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $resetPasswordToken = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $resetPasswordExpiresAt = null;
 
     /**
      * @var Collection<int, Recipe>
@@ -44,6 +83,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->recipes = new ArrayCollection();
     }
+
+    public function __toString()
+    {
+        return $this->email;
+    }
+
 
     public function getId(): ?int
     {
@@ -111,6 +156,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getResetPasswordToken(): ?string
+    {
+        return $this->resetPasswordToken;
+    }
+
+    public function setResetPasswordToken(?string $resetPasswordToken): self
+    {
+        $this->resetPasswordToken = $resetPasswordToken;
+        return $this;
+    }
+
+    public function getResetPasswordExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->resetPasswordExpiresAt;
+    }
+
+    public function setResetPasswordExpiresAt(?\DateTimeImmutable $resetPasswordExpiresAt): self
+    {
+        $this->resetPasswordExpiresAt = $resetPasswordExpiresAt;
+        return $this;
+    }
+
     /**
      * @see UserInterface
      */
@@ -145,6 +212,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($recipe->getAuthor() === $this) {
                 $recipe->setAuthor(null);
             }
+        }
+
+        return $this;
+    }
+
+
+    public function getIsAdmin(): bool
+    {
+        return in_array('ROLE_ADMIN', $this->roles, true);
+    }
+
+    public function setIsAdmin(bool $isAdmin): self
+    {
+        if ($isAdmin) {
+            if (!in_array('ROLE_ADMIN', $this->roles, true)) {
+                $this->roles[] = 'ROLE_ADMIN';
+            }
+        } else {
+            $this->roles = array_filter($this->roles, fn($role) => $role !== 'ROLE_ADMIN');
+        }
+
+        // Checking than "ROLE_USER" is always present
+        if (!in_array('ROLE_USER', $this->roles, true)) {
+            $this->roles[] = 'ROLE_USER';
         }
 
         return $this;
