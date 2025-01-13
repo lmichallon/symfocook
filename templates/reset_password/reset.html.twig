@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Symfocook | Réinitialisation du mot de passe
+{% endblock %}
+
+{% block body %}
+    <h1>Réinitialiser le mot de passe</h1>
+    {{ form_start(form) }}
+    {{ form_row(form.password) }}
+    {{ form_row(form.confirm_password) }}
+    <button type="submit">Confirmer ce nouveau mot de passe</button>
+    {{ form_end(form) }}
+{% endblock %}

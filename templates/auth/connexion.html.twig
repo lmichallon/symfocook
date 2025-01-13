@@ -1,0 +1,38 @@
+{# templates/auth/connexion.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="card mx-auto" style="max-width: 500px;">
+    <div class="card-body mt-10 background-grey">
+        <h2 class="card-title text-center text-success">Connectez-vous</h2>
+        <p class="text-center text-muted">Accédez à vos recettes préférées.</p>
+        
+        <form action="{{ path('connexion') }}" method="post" class="mt-4">
+            <div class="mb-3">
+                <label for="email" class="form-label">Adresse Email</label>
+                <input type="email" name="email" id="email" class="form-control" placeholder="Entrez votre email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Mot de Passe</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Entrez votre mot de passe" required>
+            </div>
+            {% if error %}
+                <div class="alert alert-danger">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+            <div class="d-grid">
+                <button type="submit" class="btn btn-success">Se connecter</button>
+            </div>
+        </form>
+        <br>
+        <span class="text-center">Vous n'avez pas de compte ? <a href="{{ path('inscription') }}" class="text-decoration-none">Inscrivez-vous</a></span>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+
