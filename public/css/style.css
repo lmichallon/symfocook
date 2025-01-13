@@ -60,7 +60,7 @@ a {
   background-color: #85bb65;
 }
 
-.vegan-input {
+.recipe-input {
   border: 2px solid #85bb65;
   border-radius: 8px;
   padding: 10px;
@@ -70,14 +70,14 @@ a {
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.vegan-input:focus {
+.recipe-input:focus {
   border-color: #4d774e;
   box-shadow: 0 0 8px rgba(77, 119, 78, 0.5);
   outline: none;
 }
 
 /* Styles pour le bouton */
-.vegan-submit {
+.recipe-submit {
   background-color: #4d774e;
   color: white;
   font-size: 18px;
@@ -88,12 +88,12 @@ a {
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.vegan-submit:hover {
+.recipe-submit:hover {
   background-color: #85bb65;
   transform: scale(1.05);
 }
 
-.vegan-submit:active {
+.recipe-submit:active {
   background-color: #3a5f3a;
 }
 

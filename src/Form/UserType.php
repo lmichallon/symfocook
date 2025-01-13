@@ -20,7 +20,7 @@ class UserType extends AbstractType
             ->add('email', EmailType::class, [
                 'label' => 'Adresse Email',
                 'attr' => [
-                    'class' => 'form-control vegan-input',
+                    'class' => 'form-control recipe-input',
                     'placeholder' => 'Entrez votre email',
                 ],
             ])
@@ -29,14 +29,14 @@ class UserType extends AbstractType
                 'first_options' => [
                     'label' => 'Mot de Passe',
                     'attr' => [
-                        'class' => 'form-control vegan-input',
+                        'class' => 'form-control recipe-input',
                         'placeholder' => 'Entrez un mot de passe',
                     ],
                 ],
                 'second_options' => [
                     'label' => 'Confirmer le Mot de Passe',
                     'attr' => [
-                        'class' => 'form-control vegan-input',
+                        'class' => 'form-control recipe-input',
                         'placeholder' => 'Confirmez le mot de passe',
                     ],
                 ],
@@ -44,7 +44,7 @@ class UserType extends AbstractType
             ->add('submit', SubmitType::class, [
                 'label' => 'Créer un compte',
                 'attr' => [
-                    'class' => 'btn btn-success vegan-submit',
+                    'class' => 'btn btn-success recipe-submit',
                 ],
             ]);
     }
