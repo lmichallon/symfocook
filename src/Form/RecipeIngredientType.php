@@ -31,6 +31,9 @@ class RecipeIngredientType extends AbstractType
                 'choice_label' => 'name',
                 'label' => 'Ingrédient',
                 'placeholder' => 'Choisissez un ingrédient',
+                'attr' => [
+                    'class' => 'form-select ingredient-select',
+                ],
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('i')
                         ->orderBy('i.name', 'ASC');             // Sorting in alphabetical order
@@ -43,6 +46,10 @@ class RecipeIngredientType extends AbstractType
             ->add('quantity', TextType::class, [
                 'label' => 'Quantité',
                 'required' => true,
+                'attr' => [
+                    'class' => 'form-control quantity-input',
+                    'placeholder' => 'Entrez la quantité',   
+                ],
                 'constraints' => [
                     new NotNull(['message' => 'Vous devez sélectionner une quantité.']),
                 ],
