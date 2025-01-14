@@ -31,12 +31,14 @@ security:
         always_use_default_target_path: false
       logout:
         path: deconnexion
-        target: connexion
+        target: home
 
   # Contrôle des accès
   access_control:
     - { path: ^/admin, roles: ROLE_ADMIN }
     # - { path: ^/profile, roles: ROLE_USER }
+
+  access_denied_url: /access-denied
 
 when@test:
   security:
@@ -44,6 +46,6 @@ when@test:
     password_hashers:
       Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
         algorithm: auto
-        cost: 4 # Valeur minimale pour bcrypt
-        time_cost: 3 # Valeur minimale pour argon
-        memory_cost: 10 # Valeur minimale pour argon
+        cost: 4
+        time_cost: 3
+        memory_cost: 10

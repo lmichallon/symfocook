@@ -1,8 +1,7 @@
-{# templates/auth/inscription.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="card m-auto" style="max-width: 500px;">
+<div class="card m-auto" style="max-width: 650px;">
     <div class="card-body background-grey">
         <h2 class="card-title text-center text-success">Inscrivez-vous</h2>
         <p class="text-center text-muted">Rejoignez-nous pour découvrir des recettes vegan délicieuses !</p>
@@ -26,6 +25,8 @@
                 {{ form_widget(form.submit) }}
             </div>
         {{ form_end(form) }}
+        <br>
+        <div class="text-center">Vous avez déjà un compte ? <a href="{{ path('connexion') }}" class="text-decoration-none">Connectez-vous</a></div>
     </div>
 </div>
 {% endblock %}
