@@ -702,3 +702,19 @@ form_row(form.confirm_password) }}
 Ainsi, lorsque ce formulaire est soumis et que les conditions sur les champs sont validées, le nouveau mot de passe est hashé
 et les données liées au token sont supprimées, puis les données de l'utilisateur sont mises à jour dans la base de données, et il est redirigé sur
 la page de connexion.
+
+### 3. Création du service de pagination (par _Lisa Michallon_)
+
+L'idée était de m'inspirer du **KnpPaginatorBundle** que j'avais utilisé dans de précédents projets. Je me suis donc rendue sur le dépôt GitHub du bundle et parcouru les fichiers pour comprendre son fonctionnement... sans grand succès 😅
+
+J'ai eu du mal à m'y retrouver et à comprendre ce que faisait chaque fichier et quelle était sa responsabilité. Après un moment, j'ai donc décidé de m'aider de l'IA pour y voir plus clair sur le découpage à adopter afin de respecter les principes **SOLID**, étant donné qu'ils ne me sont pas encore familliers. J'en ai compris que le KnpPaginatorBundle respectait le **Open/Closed Principle**, ce qui veut dire qu'il est ouvert à l'extension mais fermé à la modification. Il utilise des adapteurs pour gérer différentes sources de données et façon indépendante, sur lesquels s'appuie ensuite le Paginator pour manipuler les données tout en gardant une logique commune de pagination.
+
+J'ai donc voulu reproduire ça dans mon découpage de fichiers :
+
+- PaginatedResult : Encapsule les résultats paginés et leurs métadonnées. De cette façon, quel que soit le provider utilisé, la sortie du service sera toujours la même.
+
+- Paginator : Le Paginator est le cœur du service de pagination. C'est le point d'entrée utilisé dans les Controllers et qui contient la logique métier. Il expose une méthode paginate, qui prend en paramètre un provider pour manipuler les données, une page courante et le nombre d'éléments par page. Il est utilisable dans n'importe quel contexte puisque découplé de la source des données grâve aux Providers.
+
+- ProviderInterface : L'utilisation d'une interface ici permet de standardiser le comportement des providers en définissant un contrat minimal que chaque classe qui l'implémente devra respecter. De cette façon, toutes ses implémentations auront les mêmes méthodes principes, ce qui permettra une uniformité dans la logique de pagination.
+
+- DoctrineProvider : Implémente les méthodes définies dans ProviderInterface, ici pour gérer les requêtes Doctrine via un QueryBuilder. Il a été nécessaire de cloner le QueryBuilder pour éviter les effets de bord à cause de la modification de l'objet original. Ce clone est utilisé pour obtenir le nombre total d'items ainsi que les items de la page active grâce à un calcul d'_offset_ en fonction de la page active et de nombre d'items à récupérer pour une page.
