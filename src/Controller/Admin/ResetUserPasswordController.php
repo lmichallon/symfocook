@@ -47,8 +47,7 @@ class ResetUserPasswordController extends AbstractController
 
             $this->addFlash('success', 'Votre mot de passe a été modifié avec succès.');
 
-            return $this->redirectToRoute('admin');        // For testing
-//            return $this->redirectToRoute('app_login');        // TODO : Uncomment when login page was created
+            return $this->redirectToRoute('admin');       
         }
 
         // Calling the custom form's template

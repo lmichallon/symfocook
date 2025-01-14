@@ -101,6 +101,15 @@ class Recipe
         return $this;
     }
 
+    public function getDifficultyAsString(): string
+    {
+        return match($this->difficulty) {
+            Difficulty::EASY => 'Facile',
+            Difficulty::MEDIUM => 'Moyen',
+            Difficulty::HARD => 'Difficile',
+        };
+    }
+
     public function getAuthor(): ?User
     {
         return $this->author;

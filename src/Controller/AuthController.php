@@ -38,7 +38,6 @@ class AuthController extends AbstractController
             }
         }
 
-
         return $this->render('auth/connexion.html.twig', [
             'error' => $error,
         ]);
