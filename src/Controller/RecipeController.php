@@ -18,6 +18,7 @@ public function ecrireRecette(Request $request, EntityManagerInterface $entityMa
 {
     $recipe = new Recipe();
     $form = $this->createForm(RecipeType::class, $recipe);
+
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
@@ -42,6 +43,8 @@ public function ecrireRecette(Request $request, EntityManagerInterface $entityMa
         }
 
         $entityManager->flush();
+
+        $this->addFlash('success', 'Votre recette a été créée avec succès ! Vous pouvez la gérer depuis votre espace "Mon compte"');
 
         return $this->redirectToRoute('home');
     }
