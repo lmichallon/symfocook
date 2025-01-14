@@ -17,9 +17,10 @@ class DoctrineProvider implements ProviderInterface
     {
         // cloning is needed not to interfere with main query builder request
         $clone = clone $this->queryBuilder;
+        $rootAlias = $clone->getRootAliases()[0];
 
         return (int) $clone
-            ->select('COUNT(DISTINCT e.id)')
+            ->select("COUNT(DISTINCT $rootAlias.id)")
             ->resetDQLPart('orderBy') // no need to sort data as we only want to count them
             ->getQuery()
             ->getSingleScalarResult();

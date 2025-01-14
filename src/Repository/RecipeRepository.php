@@ -44,4 +44,24 @@ class RecipeRepository extends ServiceEntityRepository
 
         return $queryBuilder->getQuery()->getResult();
     }
+
+    public function findByCategoryAndIngredient(?string $category, ?string $ingredient)
+    {
+        $qb = $this->createQueryBuilder('r');
+
+        if (!is_null($category)) {
+            $qb->join('r.category', 'c')
+                ->setParameter('category', $category)
+                ->andWhere('c.name = :category');
+        }
+
+        if (!is_null($ingredient)) {
+            $qb->join('r.ingredients', 'ri')
+                ->join('ri.ingredient', 'i')
+                ->andWhere('i.name = :ingredient')
+                ->setParameter('ingredient', $ingredient);
+        }
+
+        return $qb;
+    }
 }
