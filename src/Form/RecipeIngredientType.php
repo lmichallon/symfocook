@@ -4,9 +4,13 @@ namespace App\Form;
 
 use App\Entity\Ingredient;
 use App\Entity\RecipeIngredient;
+use App\Form\IngredientFormType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -19,7 +23,7 @@ class RecipeIngredientType extends AbstractType
     private EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
-    {
+    {   
         $this->entityManager = $entityManager;
     }
 

@@ -38,7 +38,7 @@ class RecipeType extends AbstractType
                     'Difficile' => Difficulty::HARD,
                 ],
                 'choice_label' => function (?Difficulty $difficulty) {
-                    return $difficulty ? $difficulty->name : '';
+                    return $difficulty ? $difficulty->value : '';
                 },
                 'placeholder' => 'Choisissez une difficulté',
             ])

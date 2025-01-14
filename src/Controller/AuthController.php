@@ -21,31 +21,24 @@ class AuthController extends AbstractController
     #[Route('/connexion', name: 'connexion')]
     public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
-        // Obtenir les erreurs de connexion si elles existent
+        // if connexion error
         $error = $authenticationUtils->getLastAuthenticationError();
 
-        // Gérer la soumission du formulaire si une requête POST est effectuée
         if ($request->isMethod('POST')) {
             $data = $request->request->all();
-            dump($data); // Vérifiez les données du formulaire
 
-            // Récupérez les informations d'identification
             $email = $data['email'] ?? '';
             $password = $data['password'] ?? '';
 
-            // Si vous avez un utilisateur avec cet e-mail, vérifiez le mot de passe
+            // find by email
             $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
 
             if ($user && $passwordHasher->isPasswordValid($user->getPassword(), $password, $user->getSalt())) {
-                // Authentification réussie
-                // Ici, redirigez l'utilisateur
                 return $this->redirectToRoute('home');
             } else {
-                // Échec de l'authentification
                 $error = 'Identifiants invalides.';
             }
         }
-
 
         return $this->render('auth/connexion.html.twig', [
             'error' => $error,
@@ -60,14 +53,13 @@ class AuthController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // Encode le mot de passe
+            // encode password
             $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
 
-            // Sauvegarde de l'utilisateur
+            // save user
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // Rediriger vers la page de connexion ou un message de succès
             return $this->redirectToRoute('connexion');
         }
 

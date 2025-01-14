@@ -17,32 +17,36 @@ class RecipeController extends AbstractController
 public function ecrireRecette(Request $request, EntityManagerInterface $entityManager): Response
 {
     $recipe = new Recipe();
+
+    // import du form
     $form = $this->createForm(RecipeType::class, $recipe);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-        // Récupérer l'utilisateur connecté
+        // infos user
         $user = $this->getUser();
 
-        // Vérifiez que l'utilisateur est connecté (par précaution)
+        // user not connected
         if (!$user) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour créer une recette.');
         }
 
-        // Définir l'auteur
+        // define author
         $recipe->setAuthor($user);
 
-        // Persist Recipe
+        // persist recipe
         $entityManager->persist($recipe);
 
-        // Persist RecipeIngredients (automatiquement géré par Doctrine)
+        // persist RecipeIngredients
         foreach ($recipe->getIngredients() as $recipeIngredient) {
             $recipeIngredient->setRecipe($recipe);
             $entityManager->persist($recipeIngredient);
         }
 
+        // registration
         $entityManager->flush();
 
+        // redirect
         return $this->redirectToRoute('home');
     }
 
