@@ -1,19 +1,84 @@
-{# templates/default/index.html.twig #}
 {% extends 'base.html.twig' %}
 
+{% block title %}Recettes{% endblock %}
+
 {% block body %}
-<div class="text-center">
-    <h1 class="display-4">Bienvenue sur Symfocook !</h1>
-    <p class="lead">Explorez, partagez et découvrez les meilleures recettes.</p>
-</div>
+    <div class="text-center">
+        <h1 class="display-4">Bienvenue sur Symfocook !</h1>
+        <p class="lead">Explorez, partagez et découvrez les meilleures recettes.</p>
+    </div>
 
-<div class="text-center mt-5 custom-button">
-    <a class="nav-link" href="{{ path('new_recipe') }}" class="custom-button">Écrire une recette</a>
-</div>
-<div class="text-center mt-5 custom-button">
-    <a class="nav-link" href="{{ path('recipes') }}" class="custom-button">Parcourir les recettes</a>
-</div>
+    <div class="container-sm mt-4 d-flex gap-2 justify-content-center w-100">
+        <select id="category" name="category" class="form-select w-25" onchange="updateURL()">
+            <option value="">Toutes les catégories</option>
+            {% for category in categories %}
+                <option value="{{ category.name }}"
+                    {% if category.name == app.request.query.get('category') %}selected{% endif %}
+                >{{ category.name }}</option>
+            {% endfor %}
+        </select>
+        
+        <select id="ingredient" name="ingredient" class="form-select w-25" onchange="updateURL()">
+            <option value="">Tous les ingrédients</option>
+            {% for ingredient in ingredients %}
+                <option value="{{ ingredient.name }}"
+                    {% if ingredient.name == app.request.query.get('ingredient') %}selected{% endif %}
+                >{{ ingredient.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
+    <ul class="container d-flex flex-col flex-wrap justify-content-center gap-3 mt-5">
+        {% for recipe in recipes %}
+            <li class="card w-25">
+                <article class="card-body">
+                    <h5 class="card-title">{{recipe.title}}</h5>
+                    <span class="badge text-bg-secondary">{{recipe.difficulty.value}}</span>
+                    <span class="badge text-secondary border border-secondary">{{recipe.category}}</span>
+                </article>
+            </li>
+        {% endfor %}
+    </ul>
 
+    <div class="pagination w-100 mx-auto mt-5 d-flex justify-content-center gap-1">
+        {% if pagination.page > 1 %}
+            <a href="{{ path('home', { 'page': pagination.page - 1, 'category': app.request.query.get('category'), 'ingredient': app.request.query.get('ingredient') }) }}" class="btn btn-success">Précédent</a>
+        {% endif %}
 
+        {% for page in 1..pagination.totalPages %}
+            <a href="{{ path('home', { page: page, 'category': app.request.query.get('category'), 'ingredient': app.request.query.get('ingredient')  }) }}" 
+               class="btn {% if page == pagination.page %}border-success text-success{% else %}btn-success{% endif %}">
+                {{ page }}
+            </a>
+        {% endfor %}
+
+        {% if pagination.page < pagination.totalPages %}
+            <a href="{{ path('home', { page: pagination.page + 1 }) }}" class="btn btn-success">Suivant</a>
+        {% endif %}
+    </div>
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        const updateURL = () => {
+            const currentUrl = new URL(window.location.href);
+            
+            const params = {
+                category: document.getElementById('category').value,
+                ingredient: document.getElementById('ingredient').value
+            };
+            
+            Object.keys(params).forEach(param => {
+                if (params[param]) {
+                    currentUrl.searchParams.set(param, params[param]);
+                } else {
+                    currentUrl.searchParams.delete(param);
+                }
+            });
+
+            window.location.href = currentUrl.toString();
+        }
+    </script>
+{% endblock %} 

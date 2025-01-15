@@ -2,12 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Category;
-use App\Entity\Ingredient;
 use App\Entity\Recipe;
 use App\Form\RecipeType;
-use App\Service\Paginator\DoctrineProvider;
-use App\Service\Paginator\Paginator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,67 +12,40 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RecipeController extends AbstractController
 {
-    #[Route('/recipes', name: 'recipes')]
-    public function readRecipes(Request $request, EntityManagerInterface $entityManager, Paginator $paginator): Response
+    #[Route('/new-recipe', name: 'new_recipe')]
+    public function ecrireRecette(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $page = $request->query->getInt('page', 1);
-        $category = $request->query->get('category');
-        $ingredient = $request->query->get('ingredient');
+        $recipe = new Recipe();
+        $form = $this->createForm(RecipeType::class, $recipe);
 
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted() && $form->isValid()) {
 
-        $queryBuilder = $entityManager->getRepository(Recipe::class)->findByCategoryAndIngredient($category, $ingredient);
-        $provider = new DoctrineProvider($queryBuilder);
+            $user = $this->getUser();
 
-        $categories = $entityManager->getRepository(Category::class)->findAll();
-        $ingredients = $entityManager->getRepository(Ingredient::class)->findAll();
+            if (!$user) {
+                throw $this->createAccessDeniedException('Vous devez être connecté pour créer une recette.');
+            }
 
-        $pagination = $paginator->paginate($provider, $page, 9);
+            $recipe->setAuthor($user);
 
-        return $this->render('recipe/recipes.html.twig', [
-            'recipes' => $pagination->getItems(),
-            'pagination' => $pagination,
-            'categories' => $categories,
-            'ingredients' => $ingredients
+            $entityManager->persist($recipe);
+
+            foreach ($recipe->getIngredients() as $recipeIngredient) {
+                $recipeIngredient->setRecipe($recipe);
+                $entityManager->persist($recipeIngredient);
+            }
+
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre recette a été créée avec succès ! Vous pouvez la gérer depuis votre espace "Mon compte"');
+
+            return $this->redirectToRoute('home');
+        }
+
+        return $this->render('recipe/new_recipe.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
-
-    #[Route('/new-recipe', name: 'new_recipe')]
-public function ecrireRecette(Request $request, EntityManagerInterface $entityManager): Response
-{
-    $recipe = new Recipe();
-    $form = $this->createForm(RecipeType::class, $recipe);
-
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-
-        $user = $this->getUser();
-
-        if (!$user) {
-            throw $this->createAccessDeniedException('Vous devez être connecté pour créer une recette.');
-        }
-
-        $recipe->setAuthor($user);
-
-        $entityManager->persist($recipe);
-
-        foreach ($recipe->getIngredients() as $recipeIngredient) {
-            $recipeIngredient->setRecipe($recipe);
-            $entityManager->persist($recipeIngredient);
-        }
-
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Votre recette a été créée avec succès ! Vous pouvez la gérer depuis votre espace "Mon compte"');
-
-        return $this->redirectToRoute('home');
-    }
-
-    return $this->render('recipe/new_recipe.html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
-
-
 }
