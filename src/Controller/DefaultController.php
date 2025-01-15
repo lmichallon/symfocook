@@ -23,8 +23,6 @@ class DefaultController extends AbstractController
         $category = $request->query->get('category');
         $ingredient = $request->query->get('ingredient');
 
-
-
         $queryBuilder = $entityManager->getRepository(Recipe::class)->findByCategoryAndIngredient($category, $ingredient);
         $provider = new DoctrineProvider($queryBuilder);
 
