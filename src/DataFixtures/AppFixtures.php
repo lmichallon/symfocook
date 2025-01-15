@@ -19,8 +19,7 @@ class AppFixtures extends Fixture
 
     public function __construct(
         private UserPasswordHasherInterface $hasher
-    ) {
-    }
+    ) {}
 
 
     public function load(ObjectManager $manager): void
@@ -101,7 +100,7 @@ class AppFixtures extends Fixture
     }
 
 
-    private function loadRecipes(ObjectManager $manager, array $categories, array $ingredients, array $users): void
+    private function loadRecipes(ObjectManager $manager, array $categories, array $ingredients, array $users): array
     {
         $recipesData = $this->readJsonFile(__DIR__ . '/recipe.json');
         $recipeIngredientsData = $this->readJsonFile(__DIR__ . '/recipe_ingredient.json');
@@ -146,6 +145,8 @@ class AppFixtures extends Fixture
 
             $manager->persist($recipeIngredient);
         }
+
+        return $recipes;
     }
 
 

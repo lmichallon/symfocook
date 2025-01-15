@@ -17,6 +17,7 @@ class LogoutListener
     public function onLogout(LogoutEvent $event): void
     {
         $request = $this->requestStack->getCurrentRequest();
+
         if ($request) {
             $session = $request->getSession();
             if ($session) {

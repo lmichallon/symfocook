@@ -27,7 +27,7 @@ class AuthController extends AbstractController
 
             $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
 
-            if ($user && $passwordHasher->isPasswordValid($user->getPassword(), $password, $user->getSalt())) {
+            if ($user && $passwordHasher->isPasswordValid($user, $password)) {
                 return $this->redirectToRoute('home');
             } else {
                 $error = 'Identifiants invalides.';
