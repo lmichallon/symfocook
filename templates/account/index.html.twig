@@ -1,21 +1,45 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1 class="text-center">Bienvenue {{ user.email }}</h1>
+<h1 class="text-center">Bienvenue {{ user.email }}</h1>
 
-    <h3 class="m-3">Vos recettes :</h3>
+<div class="container my-5">
+    <h3 class="text-center mb-4 text-success">Vos recettes :</h3>
 
     {% if recipes is not empty %}
-        <ul class="row list-unstyled">
-            {% for recipe in recipes %}
-                <li class="col-3 m-4 p-3 border border-3">
-                    <h4>{{ recipe.title }}</h4>
-                    <p>Durée : {{ recipe.duration }} minutes</p>
-                    <p>Difficulté : {{ recipe.getDifficultyAsString() }}</p>
-                </li>
-            {% endfor %}
-        </ul>
+    <ul class="row list-unstyled g-4">
+        {% for recipe in recipes %}
+        <li class="col-12 col-md-6 col-lg-4">
+            <div class="card border-success shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h4 class="card-title text-success">{{ recipe.title }}</h4>
+                    <p class="card-text">⏱️ Durée : <strong>{{ recipe.duration }}</strong> minutes</p>
+                    <p class="card-text">💪 Difficulté : <strong>{{ recipe.getDifficultyAsString() }}</strong></p>
+
+                    <div class="row gx-2">
+                        <div class="col-6">
+                            <a href="" class="btn btn-warning w-100 text-center">
+                                Modifier la recette
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <form method="post" action="{{ path('delete_recipe', {'id': recipe.id}) }}"
+                                onsubmit="return confirm('Voulez-vous vraiment supprimer cette recette ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ recipe.id) }}">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    Supprimer la recette
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
     {% else %}
-        <p>Aucune recette trouvée.</p>
+    <p class="text-center text-muted">Aucune recette trouvée. Essayez d'en ajouter une nouvelle !</p>
     {% endif %}
+</div>
 {% endblock %}
