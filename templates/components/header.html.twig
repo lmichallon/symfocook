@@ -1,0 +1,36 @@
+<header>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="{{ path('home') }}">Symfocook</a>
+            
+            <div class="navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto d-flex gap-3">
+                    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                        <li class="nav-item">
+                            <span class="nav-link">Bonjour {{ app.user.email }}</span>
+                        </li>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('admin') }}">Accès au BO</a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('account') }}">Mon compte</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('deconnexion') }}">Se déconnecter</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('inscription') }}">Inscription</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('connexion') }}">Connexion</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
