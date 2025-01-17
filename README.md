@@ -2,7 +2,7 @@
 
 _Projet Symfony dans le cadre du Mastère 1 en Ingénierie du Web à l'ESGI de Lyon_
 
-_Par Michalon Lisa, Duperthuy Hugo et Cauvet Louis_
+_Par Michallon Lisa (lmichallon), Duperthuy Hugo (HeavenProx) et Cauvet Louis (Louis-Cauvet)_
 
 ## Objectif du projet
 

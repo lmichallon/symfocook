@@ -4,8 +4,11 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Recipe;
+use App\Form\RecipeType;
 
 class AccountController extends AbstractController
 {
@@ -18,7 +21,7 @@ class AccountController extends AbstractController
         // user's recipes
         $recipes = $user->getRecipes();
 
-        return $this->render('account/index.html.twig', [
+        return $this->render('account/account.html.twig', [
             'user' => $user, 
             'recipes' => $recipes,
         ]); 
@@ -34,7 +37,7 @@ class AccountController extends AbstractController
         }
 
         // pull recipe
-        $recipe = $entityManager->getRepository(RecipeType::class)->find($id);
+        $recipe = $entityManager->getRepository(Recipe::class)->find($id);
         if (!$recipe) {
             throw $this->createNotFoundException('Recette introuvable.');
         }
@@ -51,6 +54,62 @@ class AccountController extends AbstractController
         $this->addFlash('success', 'La recette a été supprimée avec succès.');
 
         return $this->redirectToRoute('account');
+    }
+
+    #[Route('/modify-recipe/{id}', name: 'modify_recipe', methods: ['GET', 'POST'])]
+    public function modifyRecipe(int $id, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        // verify user
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour modifier une recette.');
+        }
+
+        // pull recipe
+        $recipe = $entityManager->getRepository(Recipe::class)->find($id);
+        if (!$recipe) {
+            throw $this->createNotFoundException('Recette introuvable.');
+        }
+
+        // user == author ?
+        if ($recipe->getAuthor() !== $user) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas modifier cette recette.');
+        }
+
+        // form
+        $form = $this->createForm(RecipeType::class, $recipe);
+        $form->handleRequest($request);
+
+        // image path
+        $imageFile = $form->get('imageFile')->getData();
+        if ($imageFile) {
+            $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+            try {
+                $imageFile->move(
+                    $this->getParameter('images_directory'),
+                    $newFilename
+                );
+            } catch (FileException $e) {
+                
+            }
+
+            // update image on entity
+            $recipe->setImagePath($newFilename);
+        }
+
+        // if good -> request modify
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            $this->addFlash('success', 'La recette a été modifiée avec succès.');
+
+            return $this->redirectToRoute('account'); 
+        }
+
+        return $this->render('recipe/modify_recipe.html.twig', [
+            'form' => $form->createView(),
+            'recipe' => $recipe,
+        ]);
     }
 
 }

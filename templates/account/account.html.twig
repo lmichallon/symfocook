@@ -10,15 +10,23 @@
     <ul class="row list-unstyled g-4">
         {% for recipe in recipes %}
         <li class="col-12 col-md-6 col-lg-4">
-            <div class="card border-success shadow-sm h-100">
+            <div class="card border-success pb-2 shadow-sm h-100">
                 <div class="card-body text-center">
-                    <h4 class="card-title text-success">{{ recipe.title }}</h4>
+                    {% if recipe.images|length > 0 %}
+                        {% set firstImage = recipe.images|first %}
+                        <img src="{{ asset('uploads/images/' ~ firstImage.getImagePath()) }}" alt="Image de la recette" class="recipe-image">
+                    {% else %}
+                        <p>Aucune image disponible pour cette recette.</p>
+                    {% endif %}
+
+                    <h4 class="card-title text-success mt-2">{{ recipe.title }}</h4>
                     <p class="card-text">⏱️ Durée : <strong>{{ recipe.duration }}</strong> minutes</p>
                     <p class="card-text">💪 Difficulté : <strong>{{ recipe.getDifficultyAsString() }}</strong></p>
 
                     <div class="row gx-2">
                         <div class="col-6">
-                            <a href="" class="btn btn-warning w-100 text-center">
+                            <a href="{{ path('modify_recipe', {'id': recipe.id}) }}"
+                                class="btn btn-warning w-100 text-center">
                                 Modifier la recette
                             </a>
                         </div>

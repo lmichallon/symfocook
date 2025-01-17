@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Recipe;
+use App\Entity\RecipeImage;
 use App\Form\RecipeType;
 use App\Form\RecipeIngredientType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,35 +19,54 @@ class RecipeController extends AbstractController
     {
         $recipe = new Recipe();
 
-        // import du form
+        // Import du formulaire
         $form = $this->createForm(RecipeType::class, $recipe);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // infos user
+            // Infos utilisateur
             $user = $this->getUser();
-
-            // user not connected
             if (!$user) {
                 throw $this->createAccessDeniedException('Vous devez être connecté pour créer une recette.');
             }
 
-            // define author
+            // Définir l'auteur
             $recipe->setAuthor($user);
 
-            // persist recipe
-            $entityManager->persist($recipe);
-
-            // persist RecipeIngredients
+            // Traiter les ingrédients
             foreach ($recipe->getIngredients() as $recipeIngredient) {
                 $recipeIngredient->setRecipe($recipe);
-                $entityManager->persist($recipeIngredient);
             }
 
-            // registration
+            // Gestion des images
+            $imageFiles = $form->get('imageFiles')->getData();
+            if ($imageFiles) {
+                foreach ($imageFiles as $imageFile) {
+                    $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+                    try {
+                        $imageFile->move(
+                            $this->getParameter('images_directory'), 
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                        $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image.');
+                        return $this->redirectToRoute('new_recipe');
+                    }
+
+                    if ($newFilename) {
+                        $image = new RecipeImage();
+                        $image->setImagePath($newFilename);
+                        $recipe->addImage($image);
+                    }
+                }
+            }
+
+            // Enregistrer la recette
+            $entityManager->persist($recipe);
             $entityManager->flush();
 
-            // redirect
+            // Message de succès et redirection
+            $this->addFlash('success', 'Votre recette a été créée avec succès.');
             return $this->redirectToRoute('home');
         }
 

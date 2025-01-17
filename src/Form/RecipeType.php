@@ -16,6 +16,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Enum\Difficulty;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\Image;
 
 class RecipeType extends AbstractType
 {
@@ -46,6 +48,12 @@ class RecipeType extends AbstractType
                 'class' => Category::class,
                 'choice_label' => 'name',
                 'label' => 'Catégorie',
+            ])
+            ->add('imageFiles', FileType::class, [
+                'label' => 'Télécharger des images',
+                'multiple' => true,
+                'mapped' => false,
+                'required' => false,
             ])
             ->add('ingredients', CollectionType::class, [
                 'entry_type' => RecipeIngredientType::class,

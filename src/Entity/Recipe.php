@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use App\Enum\Difficulty;
+use App\Entity\RecipeImage; 
 use App\Repository\RecipeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RecipeRepository::class)]
 class Recipe
@@ -37,15 +39,16 @@ class Recipe
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
 
-    /**
-     * @var Collection<int, RecipeIngredient>
-     */
     #[ORM\OneToMany(targetEntity: RecipeIngredient::class, mappedBy: 'recipe', cascade: ['persist'], orphanRemoval: true)]
     private Collection $ingredients;
+
+    #[ORM\OneToMany(mappedBy: 'recipe', targetEntity: RecipeImage::class, cascade: ['persist', 'remove'])]
+    private Collection $images;
 
     public function __construct()
     {
         $this->ingredients = new ArrayCollection();
+        $this->images = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -158,6 +161,36 @@ class Recipe
             // set the owning side to null (unless already changed)
             if ($ingredient->getRecipe() === $this) {
                 $ingredient->setRecipe(null);
+            }
+        }
+
+        return $this;
+    }
+
+
+    /**
+    * @return Collection<int, RecipeImage>
+    */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(RecipeImage $image): static
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setRecipe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(RecipeImage $image): static
+    {
+        if ($this->images->removeElement($image)) {
+            if ($image->getRecipe() === $this) {
+                $image->setRecipe(null);
             }
         }
 
