@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use App\Entity\User;
 use App\Event\SendMailEvent;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -41,5 +42,26 @@ class UserPasswordListener
 
         $event = new SendMailEvent($entity);
         $this->dispatcher->dispatch($event, SendMailEvent::NAME);
+    }
+
+    public function preUpdate(PreUpdateEventArgs $args): void
+    {
+        $entity = $args->getObject();
+
+        if (!$entity instanceof User) {
+            return;
+        }
+
+        // Check if the password field is being updated
+        if ($args->hasChangedField('password')) {
+            $this->hashPassword($entity);
+
+            // Recompute changeset to ensure Doctrine is aware of the changes
+            $entityManager = $args->getObjectManager();
+            $entityManager->getUnitOfWork()->recomputeSingleEntityChangeSet(
+                $entityManager->getClassMetadata(User::class),
+                $entity
+            );
+        }
     }
 }

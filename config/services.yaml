@@ -28,6 +28,7 @@ services:
     App\EventListener\UserPasswordListener:
         tags:
             - { name: 'doctrine.event_listener', event: 'prePersist', method: 'prePersist' }
+            - { name: 'doctrine.event_listener', event: 'preUpdate', method: 'preUpdate' }
     App\EventListener\SendMailListener:
         tags:
             - { name: 'kernel.event_listener', event: 'user.registered', method: 'onUserRegistered' }
