@@ -25,3 +25,9 @@ services:
     App\EventListener\LogoutListener:
         tags:
             - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LogoutEvent', method: 'onLogout' }
+    App\EventListener\UserPasswordListener:
+        tags:
+            - { name: 'doctrine.event_listener', event: 'prePersist', method: 'prePersist' }
+    App\EventListener\SendMailListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'user.registered', method: 'onUserRegistered' }

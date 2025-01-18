@@ -118,17 +118,6 @@ class RecipeCrudController extends AbstractCrudController
            }
        }
 
-        // For testing with a predefined user (the one with ID number 1)
-        if ($entity instanceof Recipe) {
-            $defaultAuthor = $entityManager->getRepository(User::class)->find(1);
-
-            if ($defaultAuthor) {
-                $entity->setAuthor($defaultAuthor);
-            } else {
-                throw new \RuntimeException('Utilisateur de test introuvable.');
-            }
-        }
-
         parent::persistEntity($entityManager, $entity);
     }
 }

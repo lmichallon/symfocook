@@ -47,17 +47,17 @@ class AppFixtures extends Fixture
             if ($i === 0) {
                 $user
                     ->setEmail('admin@symfocook.com')
-                    ->setPassword($this->hasher->hashPassword($user, "adminPass"))
+                    ->setPassword("adminPass")
                     ->setRoles(["ROLE_ADMIN"]);
             } elseif ($i === 1) {
                 $user
                     ->setEmail('user@test.com')
-                    ->setPassword($this->hasher->hashPassword($user, "testPass"))
+                    ->setPassword("testPass")
                     ->setRoles(["ROLE_USER"]);
             } else {
                 $user
                     ->setEmail($faker->safeEmail)
-                    ->setPassword($this->hasher->hashPassword($user, $faker->password(8)))
+                    ->setPassword($faker->password(8))
                     ->setRoles(["ROLE_USER"]);
             }
 

@@ -13,7 +13,7 @@ class Paginator
         if ($page < 1) $page = 1;
 
         $totalCount = $provider->getTotalCount();
-        $totalPages = $totalPages = max(1, (int) ceil($totalCount / $itemsPerPage));
+        $totalPages = max(1, (int) ceil($totalCount / $itemsPerPage));
 
         if ($page > $totalPages) $page = $totalPages;
 

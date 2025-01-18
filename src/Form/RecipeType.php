@@ -32,6 +32,7 @@ class RecipeType extends AbstractType
                 'label' => 'Durée',
             ])
             ->add('difficulty', ChoiceType::class, [
+                'label' => 'Difficulté de la recette',
                 'choices' => [
                     'Facile' => Difficulty::EASY,
                     'Moyen' => Difficulty::MEDIUM,
@@ -45,7 +46,7 @@ class RecipeType extends AbstractType
             ->add('category', EntityType::class, [
                 'class' => Category::class,
                 'choice_label' => 'name',
-                'label' => 'Catégorie',
+                'label' => 'Catégorie de la recette',
             ])
             ->add('ingredients', CollectionType::class, [
                 'entry_type' => RecipeIngredientType::class,

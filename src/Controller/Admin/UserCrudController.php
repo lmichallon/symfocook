@@ -100,21 +100,6 @@ class UserCrudController extends AbstractCrudController
         return $actions->add(Crud::PAGE_EDIT, $resetPassword);
     }
 
-    // Allows to hash the password during a user's creation
-    public function persistEntity(EntityManagerInterface $entityManager, $entity): void
-    {
-        if ($entity instanceof User) {
-            // Checking if a password was filled in
-            if (!empty($entity->getPassword())) {
-                // Hashing password
-                $hashedPassword = $this->passwordHasher->hashPassword($entity, $entity->getPassword());
-                $entity->setPassword($hashedPassword);
-            }
-        }
-
-        parent::persistEntity($entityManager, $entity);
-    }
-
     // Sending a mail to user with a link for reset his password
     public function sendPasswordResetEmail(AdminContext $context): Response
     {
@@ -152,7 +137,6 @@ class UserCrudController extends AbstractCrudController
         $user->setResetPasswordExpiresAt(new \DateTimeImmutable('+2 hour'));
 
         // Registering user's reset token in database
-        $this->entityManager->persist($user);
         $this->entityManager->flush();
 
         // Generating the reset link
