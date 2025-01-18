@@ -16,6 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Ramsey\Uuid\Uuid;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -29,19 +30,23 @@ class UserCrudController extends AbstractCrudController
     private UrlGeneratorInterface $urlGenerator;
     private EntityManagerInterface $entityManager;
     private AdminUrlGenerator $adminUrlGenerator;
+    private Security $security;
 
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
         MailerInterface $mailer,
         UrlGeneratorInterface $urlGenerator,
         EntityManagerInterface $entityManager,
-        AdminUrlGenerator $adminUrlGenerator)
+        AdminUrlGenerator $adminUrlGenerator,
+        Security $security
+    )
     {
         $this->passwordHasher = $passwordHasher;
         $this->mailer = $mailer;
         $this->urlGenerator = $urlGenerator;
         $this->entityManager = $entityManager;
         $this->adminUrlGenerator = $adminUrlGenerator;
+        $this->security = $security;
     }
 
     public static function getEntityFqcn(): string
@@ -97,7 +102,15 @@ class UserCrudController extends AbstractCrudController
             ->linkToCrudAction('sendPasswordResetEmail')
             ->setCssClass('btn btn-primary');
 
-        return $actions->add(Crud::PAGE_EDIT, $resetPassword);
+
+        return $actions
+            ->add(Crud::PAGE_EDIT, $resetPassword)
+            ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
+                return $action->displayIf(function ($entity) {
+                    // Preventing own deletion of the logged-in user's account
+                    return $entity->getId() !== $this->security->getUser()->getId();
+                });
+            });
     }
 
     // Sending a mail to user with a link for reset his password
