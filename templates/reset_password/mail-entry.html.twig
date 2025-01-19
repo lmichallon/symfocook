@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Réinitialisation du mot de passe
+{% endblock %}
+
+{% block body %}
+    <div class="card mx-auto" style="max-width: 650px;">
+        <div class="card-body mt-10 background-grey">
+            <h1 class="card-title text-center text-success">Réinitialisation du mot de passe</h1>
+            <p class="text-center text-muted">Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.</p>
+
+            <form action="{{ path('password_request') }}" method="post" class="mt-4">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Adresse e-mail</label>
+                    <input type="email" name="email" id="email" class="form-control" placeholder="Entrez votre adresse e-mail" required>
+                </div>
+
+                {% if app.flashes('danger') %}
+                    <div class="alert alert-danger">
+                        {% for message in app.flashes('danger') %}
+                            {{ message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success">Envoyer le lien de réinitialisation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -37,6 +37,11 @@ footer {
   bottom: 0;
   width: 100%;
 }
+
+footer a {
+  color: white;
+}
+
 h1,
 h2,
 h3 {
@@ -90,7 +95,6 @@ a {
 
 .recipe-submit:hover {
   background-color: #85bb65;
-  transform: scale(1.05);
 }
 
 .recipe-submit:active {
@@ -203,3 +207,4 @@ a {
 .custom-button:hover {
   background-color: #227127; /* Couleur plus foncée au survol */
 }
+

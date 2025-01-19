@@ -166,7 +166,7 @@ class UserCrudController extends AbstractCrudController
             ->from('no-reply@symfocook.com')
             ->to($user->getEmail())
             ->subject('Réinitialisation de votre mot de passe')
-            ->html("<p>Bonjour,</p><br>
+            ->html("<p>Bonjour, un administrateur de notre site à demandé à ce que vous réinitialisiez votre mot de passe.</p><br>
             <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
             <a href='$resetLink'>Réinitialiser mon mot de passe</a><br><br>
             <p>Belle journée,</p>
