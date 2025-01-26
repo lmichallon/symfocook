@@ -55,4 +55,15 @@ class RecipeImage
 
         return $this;
     }
+
+    public function removeImage(RecipeImage $image): self
+    {
+        if ($this->images->removeElement($image)) {
+            // Set the owning side to null
+            if ($image->getRecipe() === $this) {
+                $image->setRecipe(null);
+            }
+        }
+        return $this;
+    }
 }

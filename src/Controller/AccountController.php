@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Recipe;
+use App\Entity\RecipeImage;
 use App\Form\RecipeType;
 
 class AccountController extends AbstractController
@@ -81,16 +82,16 @@ class AccountController extends AbstractController
         $form->handleRequest($request);
 
         // image path
-        $imageFile = $form->get('imageFile')->getData();
-        if ($imageFile) {
-            $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+        $imageFiles = $form->get('imageFiles')->getData();
+        if ($imageFiles) {
+            $newFilename = uniqid() . '.' . $imageFiles->guessExtension();
             try {
-                $imageFile->move(
+                $imageFiles->move(
                     $this->getParameter('images_directory'),
                     $newFilename
                 );
             } catch (FileException $e) {
-                
+                $this->addFlash('error', 'Une erreur s\'est produite lors de l\'upload de l\'image.');
             }
 
             // update image on entity
