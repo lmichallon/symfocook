@@ -192,9 +192,10 @@ a {
 }
 
 .custom-button {
-  padding: 10px 20px; /* Padding personnalisé */
+  display: block;
+  padding: 10px 20px;
   margin: 0 auto;
-  display: inline-block;
+  width: fit-content;
   border-radius: 50px;
   background-color: #2d7232;
   transition: background-color 0.3s ease;
