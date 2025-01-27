@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Category;
+use App\Entity\Ingredient;
 use App\Entity\Recipe;
 use App\Entity\RecipeImage;
 use App\Form\RecipeType;
-use App\Form\RecipeIngredientType;
+use App\Service\Paginator\DoctrineProvider;
+use App\Service\Paginator\Paginator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,28 +17,60 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class RecipeController extends AbstractController
 {
+    #[Route('/recipes', name: 'recipes')]
+    public function readRecipes(Request $request, EntityManagerInterface $entityManager, Paginator $paginator): Response
+    {
+        $page = $request->query->getInt('page', 1);
+        $category = $request->query->get('category');
+        $ingredient = $request->query->get('ingredient');
+
+        $queryBuilder = $entityManager->getRepository(Recipe::class)->findByCategoryAndIngredient($category, $ingredient);
+        $provider = new DoctrineProvider($queryBuilder);
+
+        $categories = $entityManager->getRepository(Category::class)->findAll();
+        $ingredients = $entityManager->getRepository(Ingredient::class)->findAll();
+
+        $pagination = $paginator->paginate($provider, $page, 9);
+
+        return $this->render('recipe/recipes.html.twig', [
+            'recipes' => $pagination->getItems(),
+            'pagination' => $pagination,
+            'categories' => $categories,
+            'ingredients' => $ingredients
+        ]);
+    }
+
+    #[Route('/recipe/{id}', name: 'recipe_show')]
+    public function show(Recipe $recipe): Response
+    {
+        return $this->render('recipe/show.html.twig', [
+            'recipe' => $recipe,
+        ]);
+    }
+
     #[Route('/new-recipe', name: 'new_recipe')]
     public function ecrireRecette(Request $request, EntityManagerInterface $entityManager): Response
     {
         $recipe = new Recipe();
-
-        // Import du formulaire
         $form = $this->createForm(RecipeType::class, $recipe);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Infos utilisateur
+
             $user = $this->getUser();
+
             if (!$user) {
                 throw $this->createAccessDeniedException('Vous devez être connecté pour créer une recette.');
             }
 
-            // Définir l'auteur
             $recipe->setAuthor($user);
 
-            // Traiter les ingrédients
+            $entityManager->persist($recipe);
+
             foreach ($recipe->getIngredients() as $recipeIngredient) {
                 $recipeIngredient->setRecipe($recipe);
+                $entityManager->persist($recipeIngredient);
             }
 
             // Gestion des images
@@ -45,7 +80,7 @@ class RecipeController extends AbstractController
                     $newFilename = uniqid() . '.' . $imageFile->guessExtension();
                     try {
                         $imageFile->move(
-                            $this->getParameter('images_directory'), 
+                            $this->getParameter('images_directory'),
                             $newFilename
                         );
                     } catch (FileException $e) {
@@ -61,12 +96,10 @@ class RecipeController extends AbstractController
                 }
             }
 
-            // Enregistrer la recette
-            $entityManager->persist($recipe);
             $entityManager->flush();
 
-            // Message de succès et redirection
-            $this->addFlash('success', 'Votre recette a été créée avec succès.');
+            $this->addFlash('success', 'Votre recette a été créée avec succès ! Vous pouvez la gérer depuis votre espace "Mon compte"');
+
             return $this->redirectToRoute('home');
         }
 
@@ -74,4 +107,5 @@ class RecipeController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
 }

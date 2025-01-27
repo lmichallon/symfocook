@@ -76,12 +76,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Recipe>
      */
-    #[ORM\OneToMany(targetEntity: Recipe::class, mappedBy: 'author')]
+    #[ORM\OneToMany(targetEntity: Recipe::class, mappedBy: 'author', cascade: ['remove'])]
     private Collection $recipes;
 
     public function __construct()
     {
         $this->recipes = new ArrayCollection();
+
+        $this->roles = ['ROLE_USER'];        // Default value everytime active
     }
 
     public function __toString()

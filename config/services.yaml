@@ -7,19 +7,29 @@ parameters:
   images_directory: "%kernel.project_dir%/public/uploads/images"
 
 services:
-  # default configuration for services in *this* file
-  _defaults:
-    autowire: true # Automatically injects dependencies in your services.
-    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-  # makes classes in src/ available to be used as services
-  # this creates a service per class whose id is the fully-qualified class name
-  App\:
-    resource: "../src/"
-    exclude:
-      - "../src/DependencyInjection/"
-      - "../src/Entity/"
-      - "../src/Kernel.php"
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
 
-  # add more service definitions when explicit configuration is needed
-  # please note that last definitions always *replace* previous ones
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+    App\EventListener\LogoutListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LogoutEvent', method: 'onLogout' }
+    App\EventListener\UserPasswordListener:
+        tags:
+            - { name: 'doctrine.event_listener', event: 'prePersist', method: 'prePersist' }
+            - { name: 'doctrine.event_listener', event: 'preUpdate', method: 'preUpdate' }
+    App\EventListener\SendMailListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'user.registered', method: 'onUserRegistered' }

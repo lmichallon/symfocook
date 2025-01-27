@@ -14,7 +14,7 @@
                 <div class="card-body text-center">
                     {% if recipe.images|length > 0 %}
                         {% set firstImage = recipe.images|first %}
-                        <img src="{{ asset('uploads/images/' ~ firstImage.getImagePath()) }}" alt="Image de la recette" class="recipe-image">
+                        <img src="{{ asset(firstImage.getImagePath()) }}" alt="Image de la recette" class="recipe-image w-100 h-auto">
                     {% else %}
                         <p>Aucune image disponible pour cette recette.</p>
                     {% endif %}
