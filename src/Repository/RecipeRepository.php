@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Recipe;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -45,17 +46,17 @@ class RecipeRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function findByCategoryAndIngredient(?string $category, ?string $ingredient)
+    public function buildFindByCategoryAndIngredientQuery(?string $category, ?string $ingredient): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('r');
 
-        if (!is_null($category)) {
+        if (!empty($category)) {
             $queryBuilder->join('r.category', 'c')
                 ->setParameter('category', $category)
                 ->andWhere('c.name = :category');
         }
 
-        if (!is_null($ingredient)) {
+        if (!empty($ingredient)) {
             $queryBuilder->join('r.ingredients', 'ri')
                 ->join('ri.ingredient', 'i')
                 ->andWhere('i.name = :ingredient')

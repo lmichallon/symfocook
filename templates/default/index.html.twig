@@ -8,25 +8,10 @@
         <p class="lead">Explorez, partagez et découvrez les meilleures recettes.</p>
     </div>
 
-    <div class="container-sm mt-4 d-flex gap-2 justify-content-center w-100">
-        <select id="category" name="category" class="form-select w-25" onchange="updateURL()">
-            <option value="">Toutes les catégories</option>
-            {% for category in categories %}
-                <option value="{{ category.name }}"
-                    {% if category.name == app.request.query.get('category') %}selected{% endif %}
-                >{{ category.name }}</option>
-            {% endfor %}
-        </select>
-        
-        <select id="ingredient" name="ingredient" class="form-select w-25" onchange="updateURL()">
-            <option value="">Tous les ingrédients</option>
-            {% for ingredient in ingredients %}
-                <option value="{{ ingredient.name }}"
-                    {% if ingredient.name == app.request.query.get('ingredient') %}selected{% endif %}
-                >{{ ingredient.name }}</option>
-            {% endfor %}
-        </select>
-    </div>
+    {{ form_start(form, {'attr': {'class': 'container-sm mt-4 d-flex gap-2 justify-content-center w-100', 'id': 'search-form' }}) }}
+        {{ form_row(form.category, {'attr': {'class': 'form-select w-100' }}) }}
+        {{ form_row(form.ingredient, {'attr': {'class': 'form-select w-100' }}) }}
+    {{ form_end(form) }}
 
     <ul class="container d-flex flex-col flex-wrap justify-content-center gap-3 mt-5">
         {% for recipe in recipes %}
@@ -68,23 +53,14 @@
     {{ parent() }}
 
     <script>
-        const updateURL = () => {
-            const currentUrl = new URL(window.location.href);
-            
-            const params = {
-                category: document.getElementById('category').value,
-                ingredient: document.getElementById('ingredient').value
-            };
-            
-            Object.keys(params).forEach(param => {
-                if (params[param]) {
-                    currentUrl.searchParams.set(param, params[param]);
-                } else {
-                    currentUrl.searchParams.delete(param);
-                }
-            });
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('search-form');
 
-            window.location.href = currentUrl.toString();
-        }
+            if (form) {
+                form.addEventListener('change', () => {
+                    form.submit();
+                });
+            }
+        });
     </script>
 {% endblock %} 
