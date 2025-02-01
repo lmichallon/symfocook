@@ -18,15 +18,15 @@ class ResetUserPasswordController extends AbstractController
         string $token,
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
+
     ): Response {
         // Getting user based on his reset token
         $user = $entityManager->getRepository(User::class)->findOneBy(['resetPasswordToken' => $token]);
 
         // Handling any errors that may occur
         if (!$user || $user->getResetPasswordExpiresAt() < new \DateTimeImmutable()) {
-            $this->addFlash('error', 'Le lien de réinitialisation est invalide ou expiré.');
-            return $this->redirectToRoute('app_login');
+            $this->addFlash('danger', 'Le lien de réinitialisation est invalide ou expiré.');
+            return $this->redirectToRoute('connexion');
         }
 
         // Creating a custom form
@@ -38,8 +38,7 @@ class ResetUserPasswordController extends AbstractController
         // Checking and hashing the new password when the custom form is submitted
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
-            $user->setPassword($hashedPassword);
+            $user->setPassword($data['password']);
             $user->setResetPasswordToken(null);
             $user->setResetPasswordExpiresAt(null);
 
@@ -47,7 +46,7 @@ class ResetUserPasswordController extends AbstractController
 
             $this->addFlash('success', 'Votre mot de passe a été modifié avec succès.');
 
-            return $this->redirectToRoute('admin');       
+            return $this->redirectToRoute('connexion');
         }
 
         // Calling the custom form's template

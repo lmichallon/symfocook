@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Modifier la recette : {{ recipe.title }}</h1>
+
+    {{ form_start(form, {'attr': {'class': 'recipe-form shadow p-4 rounded'}}) }}
+        <div class="mb-3">
+            {{ form_row(form.title, {'attr': {'class': 'form-control', 'placeholder': 'Titre de la recette'}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.content, {'attr': {'class': 'form-control', 'placeholder': 'Détails de la recette', 'rows': 3}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.duration, {'attr': {'class': 'form-control', 'placeholder': 'Durée en minutes'}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.difficulty, {'attr': {'class': 'form-select'}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.category, {'attr': {'class': 'form-select'}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.imageFiles, {'attr': {'class': 'form-control', 'multiple': 'multiple'}}) }}
+        </div>
+
+        <h3 class="text-center">Ingrédients</h3>
+
+        <div id="ingredients">
+            <div class="row g-3" id="ingredients-container">
+                {% for ingredientForm in form.ingredients %}
+                    <div class="col-3">
+                        <div class="ingredient-group border rounded p-3 shadow-sm">
+                            {{ form_row(ingredientForm.ingredient) }}
+                            {{ form_row(ingredientForm.quantity) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="row g-3 mt-3">
+            <div class="col-6">
+                <button class="btn btn-success w-100" type="submit">Enregistrer</button>
+            </div>
+            <div class="col-6">
+                <a href="{{ path('account') }}" class="btn btn-secondary w-100">Annuler</a>
+            </div>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

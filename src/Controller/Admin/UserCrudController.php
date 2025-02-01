@@ -16,6 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Ramsey\Uuid\Uuid;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -29,19 +30,23 @@ class UserCrudController extends AbstractCrudController
     private UrlGeneratorInterface $urlGenerator;
     private EntityManagerInterface $entityManager;
     private AdminUrlGenerator $adminUrlGenerator;
+    private Security $security;
 
     public function __construct(
         UserPasswordHasherInterface $passwordHasher,
         MailerInterface $mailer,
         UrlGeneratorInterface $urlGenerator,
         EntityManagerInterface $entityManager,
-        AdminUrlGenerator $adminUrlGenerator)
+        AdminUrlGenerator $adminUrlGenerator,
+        Security $security
+    )
     {
         $this->passwordHasher = $passwordHasher;
         $this->mailer = $mailer;
         $this->urlGenerator = $urlGenerator;
         $this->entityManager = $entityManager;
         $this->adminUrlGenerator = $adminUrlGenerator;
+        $this->security = $security;
     }
 
     public static function getEntityFqcn(): string
@@ -97,84 +102,86 @@ class UserCrudController extends AbstractCrudController
             ->linkToCrudAction('sendPasswordResetEmail')
             ->setCssClass('btn btn-primary');
 
-        return $actions->add(Crud::PAGE_EDIT, $resetPassword);
-    }
 
-    // Allows to hash the password during a user's creation
-    public function persistEntity(EntityManagerInterface $entityManager, $entity): void
-    {
-        if ($entity instanceof User) {
-            // Checking if a password was filled in
-            if (!empty($entity->getPassword())) {
-                // Hashing password
-                $hashedPassword = $this->passwordHasher->hashPassword($entity, $entity->getPassword());
-                $entity->setPassword($hashedPassword);
-            }
-        }
-
-        parent::persistEntity($entityManager, $entity);
+        return $actions
+            ->add(Crud::PAGE_EDIT, $resetPassword)
+            ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
+                return $action->displayIf(function ($entity) {
+                    // Preventing own deletion of the logged-in user's account
+                    return $entity->getId() !== $this->security->getUser()->getId();
+                });
+            });
     }
 
     // Sending a mail to user with a link for reset his password
     public function sendPasswordResetEmail(AdminContext $context): Response
     {
-        // Getting the user's id concerned by the password reset
+        // Getting the user concerned by the password reset request
+        $user =$this->getUserFromContext($context);
+
+        if (!$user) {
+            return $this->redirectWithMessage('L\'utilisateur concerné par la demande de réinitialisation de mot de passe est introuvable.', false);
+        }
+
+        // Generating and saving user's reset token
+        $resetToken = $this->generateAndSaveResetToken($user);
+
+        // Sending the reset email to user
+        $this->sendResetEmail($user, $resetToken);
+
+        // Redirecting with success message
+        return $this->redirectWithMessage('Email de réinitialisation envoyé avec succès.', true);
+    }
+
+    // Getting the user concerned by the password reset request
+    private function getUserFromContext(AdminContext $context): ?User
+    {
         $entityId = $context->getRequest()->query->get('entityId');
 
-        // Checking if the user's id was found in database
-        if (!$entityId) {
-            $this->addFlash('danger', 'ID d\'utilisateur manquant ou inconnu !.');
-            return $this->redirect(
-                $this->adminUrlGenerator
-                    ->setController(UserCrudController::class)
-                    ->setAction(Crud::PAGE_INDEX)
-                    ->generateUrl()
-            );
-        }
-
-        // Getting the user thanks to the EntityManager
         $user = $this->entityManager->getRepository(User::class)->find($entityId);
 
-        // Checking if the user's datas were found in database
-        if (!$user) {
-            $this->addFlash('danger', 'Utilisateur introuvable.');
-            return $this->redirect(
-                $this->adminUrlGenerator
-                    ->setController(UserCrudController::class)
-                    ->setAction(Crud::PAGE_INDEX)
-                    ->generateUrl()
-            );
-        }
+        return $user;
+    }
 
-        // Generating a reset token (valid for 2 hours)
+    // Generating and saving user's reset token
+    private function generateAndSaveResetToken(User $user): string
+    {
         $resetToken = Uuid::uuid4()->toString();
         $user->setResetPasswordToken($resetToken);
         $user->setResetPasswordExpiresAt(new \DateTimeImmutable('+2 hour'));
 
-        // Registering user's reset token in database
-        $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        // Generating the reset link
+        return $resetToken;
+    }
+
+    // Sending the reset email to user
+    private function sendResetEmail(User $user, string $resetToken): void
+    {
         $resetLink = $this->urlGenerator->generate('app_reset_password', [
             'token' => $resetToken,
         ], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        // Sending the reset email to the user
         $email = (new Email())
             ->from('no-reply@symfocook.com')
             ->to($user->getEmail())
             ->subject('Réinitialisation de votre mot de passe')
-            ->html("<p>Bonjour,</p><br>
-                <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
-                <a href='$resetLink'>Réinitialiser mon mot de passe</a><br><br>
-                <p>Belle journée,</p>
-                <p>L'équipe Symfocook</p>");
+            ->html("<p>Bonjour, un administrateur de notre site à demandé à ce que vous réinitialisiez votre mot de passe.</p><br>
+            <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
+            <a href='$resetLink'>Réinitialiser mon mot de passe</a><br><br>
+            <p>Belle journée,</p>
+            <p>L'équipe Symfocook</p>");
 
         $this->mailer->send($email);
+    }
 
-        // Redirects the admin to the user listing page with a message indicating that the email has been sent successfully.
-        $this->addFlash('success', 'Email de réinitialisation envoyé avec succès.');
+    // Redirecting with a message
+    private function redirectWithMessage(string $message, bool $isSuccess): Response
+    {
+        $flashType = $isSuccess ? 'success' : 'danger';
+
+        $this->addFlash($flashType, $message);
+
         return $this->redirect(
             $this->adminUrlGenerator
                 ->setController(UserCrudController::class)

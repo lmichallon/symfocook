@@ -38,6 +38,8 @@ class DashboardBackOfficeController extends AbstractDashboardController
     // Allows to configure dashboard's navmenu
     public function configureMenuItems(): iterable
     {
+        yield MenuItem::section('Navigation');
+        yield MenuItem::linkToRoute('Retour au site', 'fa fa-home', 'home');
         yield MenuItem::linkToLogout('Déconnexion', 'fa fa-door-open');
 
         yield MenuItem::section('Gestion des utilisateurs');

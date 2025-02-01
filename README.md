@@ -2,188 +2,62 @@
 
 _Projet Symfony dans le cadre du Mastère 1 en Ingénierie du Web à l'ESGI de Lyon_
 
-_Par Michalon Lisa, Duperthuy Hugo et Cauvet Louis_
+_Par Michallon Lisa (lmichallon), Duperthuy Hugo (HeavenProx) et Cauvet Louis (Louis-Cauvet)_
 
-## Objectif du projet
+## Objectifs du projet
 
 Notre objectif est de développer en Symphony un petit site de recettes, avec un système d'inscription/connexion d'utilisateurs.
-Par défaut, le site doit proposer une liste de recettes variées, qu'on doit pouvoir filtrer par catégorie ou diffficulté.
+Par défaut, le site doit proposer une liste de recettes variées, qu'on doit pouvoir filtrer par catégorie, diffficulté ou en cumulant les 2.
+
 On doit aussi pouvoir effectuer une recherche, afin d'obtenir les recettes dont le nom, la description ou les ingrédients correspondent à ce qui a été saisi.
+Chaque recette se composera d'un ou plusieurs ingrédients, parmi une liste prédéfinie en base de données (ce qui fait qu'on aura une relation *manyToMany* entre ingrédients et recettes.
 
-De plus, un utilisateur connecté pourra créer une nouvelle recette sur la site, modifier les recettes qu'il a créé mais aussi ajouter des recettes dans ces favoris.
+De plus, un utilisateur connecté pourra créer une nouvelle recette sur la site, et modifier les recettes qu'il a créé.
 
-Afin, un utilisateur possédant le rôle admin bénéficiera d'un Back-Office depuis lequel il pourra modifier, ajouter ou supprimer toutes les recettes et les autres utilisateurs.
+Enfin, un utilisateur possédant le rôle admin bénéficiera d'un Back-Office depuis lequel il pourra modifier, ajouter ou supprimer toutes les recettes et les autres utilisateurs.
+Il pourra également demander la réinitialisation du mot de passe d'un autre utilisateur.
 
-## Réalisation du projet
+## Données de tests
+A l'aide des fixtures mises en place, nous avon pu définir des données de tests réalistes, notamment 2 comptes utilisateurs :
+- 1 compte admin : login = **admin@symfocook.com** et mdp = **adminPass** 
+- 1 Compte 'utilisateur lambda' : login = **user@test.com** et mdp : **testPass**
 
-### 1) Création des fixtures _(par Louis Cauvet)_
+## Points techniques du projet
+
+### - Création des fixtures _(par Louis Cauvet)_
 
 Afin d'obtenir suffisament de données de tests, j'ai demandé à ChatGpt de me générer des fichiers JSON recensant une dizaine de catégories de recettes,
-240 ingrédients, 90 recettes et toutes les relations ingrédient-recette nécéssaires pour obtenir des données réalistes.
+240 ingrédients, 90 recettes et toutes les relations "ingrédient-recette nécéssaires" pour obtenir des données réalistes.
 
 Une fois un résultat satisfaisant obtenu, et la bonne corrrepondance entre les données vérifiée, j'ai mis en place dans
-_"src/DataFixtures/AppFixtures.php"_ plusieurs fonctions permettant de d'insérer ces données dans la base de données à partir des fichiers JSON.
+_"src/DataFixtures/AppFixtures.php"_ plusieurs fonctions permettant d'insérer ces données dans la base de données à partir des fichiers JSON.
 
-### 2) Mise en place du Back-Office pour les utilisateurs admins _(par Louis Cauvet)_
+### - Modification de l'affichage des clés étrangères dans les tableaux du BO _(par Louis Cauvet)_
+Dans le BO créé à l'aide du bundle EasyAdmin, on retrouve des tableaux listant les différentes recettes de la base de données.
+Cependant, dans la colonne 'Auteur' de ce tableau, les données qui apparaissent sont les identifiants numériques des utilisateurs, 
+alors qu'on souhaiterai afficher leurs adresses mails pour + de clarté. 
 
-#### Ajout du bundle EasyAdmin au projet
-
-On installe le Bundle "EasyAdminBundle", qui va nous permettre de générer des CRUD pour les recettes et les utilisateurs..
-Pour cela, on l'installe via Composer avec la commande `composer require easycorp/easyadmin-bundle`.
-
-On exécute ensuite la commande `php bin/console make:admin:dashboard` afin de générer un controlleur d'administration
-(que l'on retrouve dans _'src/Controller/Admin/DashboardBackOfficeController_).
-
-#### Configuration des routes du Back-Office
-
-On active ensuite un chargeur de route personnalisé dans notre application, en créant le fichier _'config/routes/easyadmin.yaml'_
-et en y insérant le code :
-
-```yaml
-easyadmin:
-  resource: .
-  type: easyadmin.routes
-```
-
-⚠️Ce code permet d'indiquer à Symfony qu'il doit déléguer la gestion des routes au bundle EasyAdmin, puisque Symfony ne
-connaît pas nativement les routes que génère le bundle. Ainis, lorsqu'on ajoutera des contrôleurs CRUD, ce charger de routes
-créera de lui-même toutes les urls nécéssaires pour chacun d'entre eux.
-(source : https://symfony.com/bundles/EasyAdminBundle/current/dashboards.html#pretty-admin-urls)
-
-On indique ensuite que lors de l'arrivée d'un admin dans le back-office, il doit être redirigé sur la page de gestion des recettes :
-
-```php
-#[Route('/admin', name: 'admin')]
-    public function index(): Response
-    {
-         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-         return $this->redirect($adminUrlGenerator->setController(RecipeCrudController::class)->generateUrl());
-    }
-```
-
-#### Ajout des restrictions d'accès au BO
-
-⚠️ On choisit de laisser l'url par défaut pour la route permettant d'accéder au Back-Office, à savoir "/admin".
-Ainsi, dans "_config/packages/security.yaml_", on ajoute la ligne suivante :
-
-```yaml
-security:
-  access_control:
-    - { path: ^/admin, roles: ROLE_ADMIN }
-```
-
-qui permet de limiter l'accès à toutes les pages du Back-office (dont l'url commencera donc par "/admin") uniquement aux utilisateurs dont le rôle est "ROLE_ADMIN".
-
-#### Paramétrage de l'interface du BO
-
-On ajoute ensuite la configuration de notre back-office dans les fonctions du controlleur, conformément aux différentes options
-qui nous sont présentées dans la doc du Bundle :
-
-```php
-public function configureDashboard(): Dashboard
-{
-    return Dashboard::new()
-        ->setTitle('SymfoCook - Back Office');
-}
-
-public function configureMenuItems(): iterable
-{
-    yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
-
-    yield MenuItem::section('Gestion des utilisateurs');
-    yield MenuItem::linkToCrud('Utilisateurs', 'fa fa-user', User::class);
-
-    yield MenuItem::section('Gestion des recettes');
-    yield MenuItem::linkToCrud('Recettes', 'fa fa-utensils', Recipe::class);
-}
-```
-
-#### Création des CRUD pour les recettes et les utilisateurs
-
-On peut ensuite générer un contrôleur pour le CRUD de l'entité 'Recipe', avec la commande `php bin/console make:admin:crud`.
-On fait de même pour le CRUD de l'entité 'User'.
-
-Il faut alors modifier les fonctions "configureFields" de ces contrôleurs pour que les champs correspondent à ceux stockés en base de données.
-_Exemple pour 'Recipe'_ :
-
-```php
-public function configureFields(string $pageName): iterable
-{
-    return [
-        IdField::new('id')
-            ->hideOnIndex()        // "hideOnIndex" --> allows to hide this field on listing arrays
-            ->hideOnForm(),        // "hideOnForm"--> allows to hide this field on forms
-        TextField::new('title', 'Titre'),
-        TextareaField::new('content', 'Déroulé de la recette')->setSortable(false),      // "setSortable(false)"--> allows to prevent sorting
-        NumberField::new('duration', 'Durée (en minutes)'),
-        ChoiceField::new('difficulty', 'Difficulté')
-            ->setChoices([
-                'Facile' => Difficulty::EASY,
-                'Moyen' => Difficulty::MEDIUM,
-                'Diffcile' => Difficulty::HARD,
-            ]),
-        AssociationField::new('author', 'Auteur'),
-        AssociationField::new('category', 'Catégorie'),
-    ];
-}
-```
-
-#### Gestion de la déconnexion au BO
-
-On souhaite ajouter un lien de déconnexion dans le menu du Back-Office. Pour cela, on ajoute la ligne suivante :
-
-```php
-yield MenuItem::linkToLogout('Déconnexion', 'fa fa-door-open');
-```
-
-dans la fonction "configureMenuItems" du controller de Dashboard.
-On doit alors préciser le point de déconnexion dans _'config/packages/security.yaml'_ :
-
-```yaml
-security:
-  firewalls:
-    main:
-      pattern: ^/
-      logout:
-        path: app_logout
-        target: /
-```
-
-et renseigner la route correspondante dans le controleur du Dashboard :
-
-```php
-#[Route('/logout', name: 'app_logout')]
-public function logout(): void
-{
-}
-```
-
-⚠️ Cette fonction peut rester vide, car le code ajouté dans _'security.yaml'_ effectuera une redirection automatique
-vers la page d'acueil du site (grâce à l'attribut 'target').
-
-#### Modification de l'affichage des clés étrangères dans les tableaux du BO
-
-On souhaite également que sur les tableaux de listing des différentes recettes, ce ne soit pas l'dientifiant de l'auteur
-mais son adresse mail qui soit affichée. Pour cela, on peut ajouter la méthode magique `__toString` dans l'entité "User" :
-
+Pour cela, j'ai ajouté la fameuse méthode magique `__toString` dans le code de l'entité "User" :
 ```php
 public function __toString()
 {
     return $this->email;
 }
 ```
+⚠️ Cette méthode permet d'afficher une certaine propriété de l'entité comme contenu textuel principal définissant l'entité (ici l'adresse mail).
 
-Cependant, le tri de la colone s'effetue toujours selon l'ordre des identifiants. Pour résoudre ce problème, on a besoin d'une
-fonction qui convertisse la demande de tri sur la colonne 'Auteur' (représentée par `$searchDto->getSort()['author']`)
-en la requête SQL :
 
+Cependant, le tri de la colonne du tableau s'effectue toujours selon l'ordre des identifiants, et non des adresses mails. 
+
+Pour résoudre ce problème, j'ai mis en place une fonction qui convertit la demande de tri sur la colonne 'Auteur' (représentée
+dans le code par `$searchDto->getSort()['author']`) en la requête SQL suivante :
 ```sql
 SELECT entity FROM Recipe entity
 LEFT JOIN entity.author author
 ORDER BY author.email ASC
 ```
 
-Ainsi, la fonction permettantd e réaliser ceci (qui est à ajouter dans le controlleur du CRUD de recettes) est la suivante :
+Cette fonction est la suivante (que j'ai ajoutée dans le controlleur du CRUD de recettes *"src/Controller/Admin/RecipeCrudController.php"*) :
 
 ```php
  public function createIndexQueryBuilder(SearchDto $searchDto,EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
@@ -198,140 +72,18 @@ Ainsi, la fonction permettantd e réaliser ceci (qui est à ajouter dans le cont
 }
 ```
 
-#### Traduction des champs natifs de EasyAdmin
-
-Actuellement, les champs liés aux fonctionnalités natives de EasyAdmin s'affichent en anglais ("Add", "Edit", "Delete", "Search", Previous", "Next", "Results"...).
-On souhaite donc paramétrer la langue du bundle en français pour que ces champs soient traduits.
-Pour cela, il faut modifier la langue par défaut du projet, dans _"config/packages/translation.yaml_:
-
-```yaml
-framework:
-  default_locale: fr
-```
-
-⚠️ On peut laisser "en" pour la partie "fallbacks" de ce fichier, afin que les chaînes dont la traduction française n'est pas trouvée s'affichent en anglais par défaut.
-
-Cependant, les noms des entités sont toujours en anglais, puisqu'elles ont été définies ainsi dans le code ("Recipe", "User").
-<span style="color: #FF0000">A effectuer !</span>
-
-#### Rectification/Personnalisation du formulaire de création de recette
-
-Lorsqu'on essaie de créer une nouvelle recette, on rencontre une erreur car le champ "Difficulté" du formulaire se base sur
-une valeur textuelle au lieu d'une valeur que l'on retrouve dans l'énumération "Difficulty".
-Pour corriger ceci tout en continuant d'avoir une valeur textuelle affichée dans les tableaux de listing de recettes, il nous faut dissocier les 2 cas dans la définition des champs
-du contrôleur du CRUD de recettes, en remplaçant ceci :
-
-```php
-ChoiceField::new('difficulty', 'Difficulté')
-->setChoices([
-    'Facile' => Difficulty::EASY,
-    'Moyen' => Difficulty::MEDIUM,
-    'Difficile' => Difficulty::HARD,
-]),
-```
-
-par ceci :
-
-```php
-// Difficulty field only for forms
-ChoiceField::new('difficulty', 'Difficulté')
-    ->setChoices([
-        'Facile' => Difficulty::EASY,
-        'Moyen' => Difficulty::MEDIUM,
-        'Difficile' => Difficulty::HARD,
-    ])
-    ->onlyOnForms(),
-
-// Difficulty field only for tables
-ChoiceField::new('difficulty', 'Difficulté')
-    ->setChoices([
-        'Facile' => Difficulty::EASY->value,
-        'Moyen' => Difficulty::MEDIUM->value,
-        'Difficile' => Difficulty::HARD->value,
-    ])
-    ->onlyOnIndex(),
-```
-
-Autre souci, lors de la création d'une recette via le formulaire, il y a aussi par défaut un champ "Auteur" permettant d'indiquer
-quel utilisateur est l'auteur de cette recette, alors qu'on souhaite que la recette fraîchement créée soit automatiquement associée
-à l'admin connecté. Pour ceci, on va masquer le champ "Auteur" des formulaires, dans la fonction "configureFields" du contrôleur de CRUD de recettes :
-
-```php
-AssociationField::new('author', 'Auteur')->hideOnForm(),
-```
-
-Il nous faut aussi définir une surcharge de la fonction 'persistEntity' du contrôleur, afin de capter l'utilisateur connecté et de le définir
-comme étant l'auteur de la recette dans la base de données.
-Pour cela :
-
-```php
- public function persistEntity(EntityManagerInterface $entityManager, $entity): void
-    {
-        // Inserting the connected admin user as author of new recipe
-        if ($entity instanceof Recipe) {
-            $connectedUser = $this->security->getUser();
-
-            if ($connectedUser) {
-                $entity->setAuthor($connectedUser);
-            } else {
-                throw new \RuntimeException('Impossible de reconnaître l\'utilisateur connecté !');
-            }
-        }
-
-        parent::persistEntity($entityManager, $entity);
-    }
-```
-
-_(Source : https://symfony.com/bundles/EasyAdminBundle/current/crud.html#creating-persisting-and-deleting-entities)_
-
-⚠️On a besoin d'injecter la dépendance "Security" dans le constructeur de la classe,
-car c'est elle qui nous permet de récupérer ensuite l'utilisateur connecté (via la variable `$security`) :
-
-```php
-private Security $security;
-
-public function __construct(Security $security)
-{
-    $this->security = $security;
-}
-```
-
-#### Affichage de la liste des ingrédients pour chaque recette
-
-Dans notre tableau de listing des recettes, il nous manque également le détail des ingrédients et des quantités nécéssaires
-pour chaque recette, puisque ces données proviennent d'autres tables qui 'RecipeIngredient' (pour la quantité de chaque ingrédient) et 'Ingredient' (pour le nom des ingrédients).  
-Pour le rajouter au tableau, il faut donc définir un nouveau champ dans la fonction 'configureFields' du contrôleur de CRUD de recettes, à savoir :
-
-```php
+### - Ajout d'ingrédients lors de la gestion d'une recette depuis le BO _(par Louis Cauvet)_
+Pour gérer la relation 'ManyToMany' établie entre les entités 'Recette' et 'Ingrédient', j'ai du utiliser un formulaire personnalisé
+qui est utilisé comme partie du formulaire permettant de créer ou de modifier des recettes depuis le Back-Office.
+Ainsi, dans la fonction ```configureFields()``` de la classe *"src/Controller/Admin/RecipeCrudController.php"*, j'ai ajouté le champ suivant :
+```php 
 CollectionField::new('ingredients', 'Détail des ingrédients')
-    ->formatValue(function ($value,$entity) {
-        return implode(', ', $entity->getIngredients()->map(function ($recipeIngredient) {
-            return $recipeIngredient->getIngredient()->getName() . ' (' . $recipeIngredient->getQuantity() . ')';
-        })->toArray());
-    })
-    ->onlyOnIndex(),
-```
-
-⚠️Ces lignes permettent de récupérer les données que l'on désire grâce aux fonctions `getIngredients` de l'entité 'Recipe', et
-`getIngredient` de l'entité 'RecipeIngrédient', qui font un travail équivalent à des jointures SQL pour récupérer les données d'autres entités/tables
-vers celle dans laquelle on se situe (à savoir "Recipe"). Elle permet également de définir le format d'affichage des données dans la cellule de tableau.
-
-#### Inclusion de la liste des ingrédients dans les formulaires de création/de modification de recette (partie assistée par IA)
-
-Pour pouvoir indiquer la liste des ingrédients lors de la création ou de la modification d'une recette, il faut que l'on ajoute de nouveaux champs aux formulaires.
-Cependant, la relation complexe OneToMany établie entre "Recipe" et "RecipeIngredient" implique de devoir mettre en place un formulaire personnalisé,
-avec un répéteur permettant de saisir autant d'ingérdients que nécéssaire. Ainsi, on définit dans la fonction
-"ConfigureField" du contrôleur du CRUD de recettes le champ personnalisé suivant :
-
-```php
- CollectionField::new('ingredients', 'Détail des ingrédients')
-    ->setEntryType(RecipeIngredientType::class)           // Personalized form
+    ->setEntryType(RecipeIngredientType::class)     // Personalized form
     ->onlyOnForms(),
 ```
-
-qui correspond à une nouvelle classe "src/Form/RecipeIngredientType.php", dans laquelle on retourve la fonction suivante :
-
-```php
+qui fait référence à la classe de formulaire que j'ai créée dans *"src/Form/RecipeIngredientType.php"*,
+qui sert à définir le formulaire suivant :
+```php 
 public function buildForm(FormBuilderInterface $builder, array $options): void
 {
     $builder
@@ -340,9 +92,12 @@ public function buildForm(FormBuilderInterface $builder, array $options): void
             'choice_label' => 'name',
             'label' => 'Ingrédient',
             'placeholder' => 'Choisissez un ingrédient',
+            'attr' => [
+                'class' => 'form-select ingredient-select',
+            ],
             'query_builder' => function (EntityRepository $er) {
                 return $er->createQueryBuilder('i')
-                    ->orderBy('i.name', 'ASC');           // Sorting in alphabetical order
+                    ->orderBy('i.name', 'ASC');             // Sorting in alphabetical order
             },
             'required' => true,
             'constraints' => [
@@ -352,262 +107,140 @@ public function buildForm(FormBuilderInterface $builder, array $options): void
         ->add('quantity', TextType::class, [
             'label' => 'Quantité',
             'required' => true,
+            'attr' => [
+                'class' => 'form-control quantity-input',
+                'placeholder' => 'Entrez la quantité',   
+            ],
             'constraints' => [
                 new NotNull(['message' => 'Vous devez sélectionner une quantité.']),
             ],
         ]);
 }
 ```
+Ce formulaire ```RecipeIngredientType``` me permet donc de choisir 1 ou plusieurs ingrédients et leurs quantités associées à la recette 
+que l'admin créée/modifie.
 
-⚠️ Cette fonction permet de récupérer tous les ingrédients disponibles dans la base de données, et de les transformer en une
-liste de choix (triée par ordre alphabétique), accompagnée d'un champ texte qui indique la quantité associée à l'ingrédient choisi.
-On a ajouté un contrainte qui oblige à renseigner une quantité si un ingrédient est sélectionné, et inversement.
+<span style="color: #FF0000">Evolution possible :</span> Actuellement, la liste de tous les ingrédients est un simple champ ```select```
+qui répertorie tous les ingrédients stockés en base de données, triés par ordre alphabétique.
+Ce qui aurait été encore mieux, ça aurait été d'avoir un champ textuel qui permette à l'utilisateur de renseigner un aliment
+qui n'existerait pas en base de données, mais tout en ayant une ```datalist``` qui propose des ingrédients de la base de données
+qui correspondent à la saisie de l'utilisateur pour éviter d'éventuels doublons d'ingrédients.
 
-<span style="color: #FF0000">Evolution possible :</span> Ce qui aurait été encore mieux, c'est que l'utilisateur se voit proposer
-la liste de tous les ingrédients dans la base de données, mais qu'il saisisse librement du texte dans un champ afin que les propositions
-d'ingrédients se réduisent au fur et à mesure de la saisie (comme pour une datalist).  
-Ca aurait notamment permis à un utilisateur de renseigner un nouvel ingrédient à ajouter à la base de données dans le cas
-où aucun de la liste ne correspond à ses besoins.
+### - Mise en place d'events listeners s'appliquant lors de la création d'un compte-utilisateur _(par Louis Cauvet)_
+J'ai mis en place des events listeners qui se déclanchent lorsqu'un nouvel utilisateur est créé :
 
-#### Rectification/Personnalisation du formulaire de création d'utilisateur
-
-Pour le formulaire de création d'un utilisateur, on souhaite qu'il y ai une case à cocher qui permette de choisir si l'utilisateur est
-un admin ou non. Pour cela, on ajoute le champ suivant dans la fonction "configureFields" du contrôleur du CRUD d'utilisateur :
-
+- Le premier permet de hasher automatiquement le mot de passe choisi par l'utilisateur. Pour cela, dans *"src/EventListener/UserPasswordListener.php"*,
+j'ai défini les fonctions suivantes :
 ```php
-// Display roles' list in array
-ArrayField::new('roles', 'Rôles')
-    ->onlyOnIndex(),
-
-// Display roles' choice in forms
-BooleanField::new('isAdmin', 'Utilisateur administrateur')
-    ->renderAsSwitch(false)
-    ->onlyOnForms(),
-```
-
-⚠️ On définit 2 champs différents, un tableau sous qui affichera tous les rôles de l'utilisateur sur la vue de liste d'utilisateur,
-et une checkbox pour les formulaires.
-
-Pour associer les bons rôles au nouvel utilisateur crée, on ajoute la fonction suivante dans le code de l'entité "User" :
-
-```php
-public function setIsAdmin(bool $isAdmin): self
+private function hashPassword(User $user): void
 {
-    if ($isAdmin) {
-        if (!in_array('ROLE_ADMIN', $this->roles, true)) {
-            $this->roles[] = 'ROLE_ADMIN';
-        }
-    } else {
-        $this->roles = array_filter($this->roles, fn($role) => $role !== 'ROLE_ADMIN');
+    if (!$user->getPassword()) {
+        return;
     }
 
-    // Checking than "ROLE_USER" is always present
-    if (!in_array('ROLE_USER', $this->roles, true)) {
-        $this->roles[] = 'ROLE_USER';
+    $hashedPassword = $this->passwordHasher->hashPassword($user, $user->getPassword());
+    $user->setPassword($hashedPassword);
+}
+
+public function prePersist(LifecycleEventArgs $args): void
+{
+    $entity = $args->getObject();
+
+    if (!$entity instanceof User) {
+        return;
     }
 
-    return $this;
+    $this->hashPassword($entity);
+
+    $event = new SendMailEvent($entity);
+    $this->dispatcher->dispatch($event, SendMailEvent::NAME);
 }
 ```
-
-Ce code permet d'attribuer le rôle `ROLE_ADMIN` uniquement si la case du formulaire est cochée, et également à attribuer le
-rôle `ROLE_USER` quoi qu'il arrive.
-
-#### Ajout de vérifications sur les champs
-
-Pour ajouter des vérifications supplémentaires et des messages d'erreurs personalisés sur un champ comme par exemple le mot de passe,
-il faut les définir au niveau de la proprété correspondante dans le code de l'entité :
-
-```php
-#[ORM\Column]
-#[NotBlank(message: 'Le mot de passe ne peut pas être vide.')]
-#[Length(
-    min: 8,
-    minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.',
-)]
-#[Regex(
-    pattern: '/[A-Z]/',
-    message: 'Le mot de passe doit contenir au moins une lettre majuscule.'
-)]
-#[Regex(
-    pattern: '/[a-z]/',
-    message: 'Le mot de passe doit contenir au moins une lettre minuscule.'
-)]
-#[Regex(
-    pattern: '/\d/',
-    message: 'Le mot de passe doit contenir au moins un chiffre.'
-)]
-#[Regex(
-    pattern: '/[\W_]/',
-    message: 'Le mot de passe doit contenir au moins un caractère spécial (par exemple : ! @ # $ % ^ & *).'
-)]
-private ?string $password = null;
-```
-
-Il faut également penser à activer la validation d'entité dans le fichier de configuration "config/packages/validator.yaml" :
-
+⚠️ La fonction ```prePersist()``` se déclanche avant que les données du nouvel utilisateur ne soient stockées en base de données,car on l'a spécifié 
+dans *"config/services.yaml"*:
 ```yaml
-framework:
-  validation:
-    enable_attributes: true
+App\EventListener\UserPasswordListener:
+    tags:
+        - { name: 'doctrine.event_listener', event: 'prePersist', method: 'prePersist' }
 ```
 
-Ainsi, si la saisie d'un champ ne correspond pas aux critères indiqués, le message d'erreur associé au critère s'affichera en dessous
-du champ, et la validation du formulaire sera bloquée.
-(source : https://symfony.com/doc/current/reference/constraints.html)
-
-⚠️ De la même manière, on peut par exemple bloquer la validation du formulaire de création d'utilisateur si l'adresse mail renseignée.
-est déja associée à un compte dans la base de données :
-
+- J'ai également mis en place un event listener personalisé qui permet d'envoyer un mail de confirmation de création de son compte à l'utilisateur, dans *"src/EventListener/SendMailListener.php"*:
 ```php
-#[UniqueEntity(
-    fields: ['email'],
-    message: 'Cette adresse e-mail est déjà utilisée. Veuillez en choisir une autre.'
-)]
-```
+ public function onUserRegistered(SendMailEvent $event): void
+{
+    $user = $event->getUser();
 
-#### Modification du formulaire de modification d'un utilisateur (partie assistée par IA)
+    $email = (new Email())
+        ->from('no-reply@symfocook.com')
+        ->to($user->getEmail())
+        ->subject('Bienvenue chez Symfocook')
+        ->html("<p>Bonjour,</p>
+            <p>Nous avons le plaisir de vous confirmer la création de votre compte Symfocook !</p>
+            <br>
+            <p>Au plaisir de vous retrouver parmi nous.</p>
+            <p>L'équipe Symfocook</p>");
 
-Pour le formulaire de modification d'un utilisateur, nous souhaitons que le champ "Adresse mail" ne soit pas modifiable,
-et qu'à la place du champ "Mot de passe", on retrouve un bouton qui peremtte de réinitialiser le mot de passe de l'utilisateur en lui
-envoyant un mail avec un lein vers un formulaire sur lequel il pourra saisir son nouveau mot de passe.
-
-Pour cela, on définit une structure de formulaire différente dans la fonction `configureFields` lorsque la page est destinée à la modification :
-
-```php
-if ($pageName === Crud::PAGE_EDIT) {
-    return [
-        IdField::new('id')->hideOnForm(),
-        TextField::new('email', 'Adresse e-mail')
-            ->setFormTypeOption('disabled', true),       // Make the field unmodifiable
-
-        // Display roles' choice in forms
-        BooleanField::new('isAdmin', 'Utilisateur administrateur')
-            ->renderAsSwitch(false)
-            ->onlyOnForms(),
-    ];
+    $this->mailer->send($email);
 }
 ```
+Cet event listener se déclanche une fois un utilisateur enregistré, car on l'a défini ainsi dans *"config/services.yaml"* :
+```yaml
+App\EventListener\SendMailListener:
+    tags:
+        - { name: 'kernel.event_listener', event: 'user.registered', method: 'onUserRegistered' }
+```
 
-Pour ajouter le fameux bouton qui déclanchera l'envoi d'un mail de réinitialisation du mot de passe à l'utilisateur concerné, on utilise
-la fonction "configureActions" du même contrôleur :
-
+### - Mise en place de la procédure d'envoi de mail de réinitialisation de mot de passe _(par Louis Cauvet)_
+Je souhaitais qu'un admin ait la possibililité de demander la réinitialisation du mot de passe d'un utlisateur depuis le Back-Office.
+Pour cela, j'ai utilisé la fonction ```configureActions()``` de EasyAdmin dans *"src/Controller/Admin/UserCrudController.php"*, afin de rajouter une action pour chacune des pages de modification d'un utilisateur:
 ```php
- // Allows to add a custom cta for reset user's password
-public function configureActions(Actions $actions): Actions
+ public function configureActions(Actions $actions): Actions
 {
     $resetPassword = Action::new('resetPassword', 'Réinitialiser le mot de passe')
         ->linkToCrudAction('sendPasswordResetEmail')
         ->setCssClass('btn btn-primary');
-
-    return $actions->add(Crud::PAGE_EDIT, $resetPassword);
 }
 ```
-
-On définit également l'action liée au clic sur ce bouton (avec `linkToCrudAction`) dans ce contrôleur :
-
+Lorsque l'admin clique sur ce CTA, cela appelle la fonction ```sendPasswordResetEmail``` de *"src/Controller/Admin/UserCrudController.php"* :
 ```php
-// Sending a mail to user with a link for reset his password
 public function sendPasswordResetEmail(AdminContext $context): Response
 {
-    // Getting the user's id concerned by the password reset
-    $entityId = $context->getRequest()->query->get('entityId');
+    // Getting the user concerned by the password reset request
+    $user =$this->getUserFromContext($context);
 
-    // Checking if the user's id was found in database
-    if (!$entityId) {
-        $this->addFlash('danger', 'ID d\'utilisateur manquant ou inconnu !.');
-        return $this->redirect(
-            $this->adminUrlGenerator
-                ->setController(UserCrudController::class)
-                ->setAction(Crud::PAGE_INDEX)
-                ->generateUrl()
-        );
-    }
-
-    // Getting the user thanks to the EntityManager
-    $user = $this->entityManager->getRepository(User::class)->find($entityId);
-
-    // Checking if the user's datas were found in database
     if (!$user) {
-        $this->addFlash('danger', 'Utilisateur introuvable.');
-        return $this->redirect(
-            $this->adminUrlGenerator
-                ->setController(UserCrudController::class)
-                ->setAction(Crud::PAGE_INDEX)
-                ->generateUrl()
-        );
+        return $this->redirectWithMessage('L\'utilisateur concerné par la demande de réinitialisation de mot de passe est introuvable.', false);
     }
 
-    // Generating a reset token (valid for 2 hours)
-    $resetToken = Uuid::uuid4()->toString();
-    $user->setResetPasswordToken($resetToken);
-    $user->setResetPasswordExpiresAt(new \DateTimeImmutable('+2 hour'));
+    // Generating and saving user's reset token
+    $resetToken = $this->generateAndSaveResetToken($user);
 
-    // Registering user's reset token in database
-    $this->entityManager->persist($user);
-    $this->entityManager->flush();
+    // Sending the reset email to user
+    $this->sendResetEmail($user, $resetToken);
 
-    // Generating the reset link
-    $resetLink = $this->urlGenerator->generate('app_reset_password', [
-        'token' => $resetToken,
-    ], UrlGeneratorInterface::ABSOLUTE_URL);
-
-    // Sending the reset email to the user
-    $email = (new Email())
-        ->from('no-reply@symfocook.com')
-        ->to($user->getEmail())
-        ->subject('Réinitialisation de votre mot de passe')
-        ->html("<p>Bonjour,</p><br>
-            <p>Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
-            <a href='$resetLink'>Réinitialiser mon mot de passe</a><br><br>
-            <p>Belle journée,</p>
-            <p>L'équipe Symfocook</p>");
-
-    $this->mailer->send($email);
-
-    // Redirects the admin to the user listing page with a message indicating that the email has been sent successfully.
-    $this->addFlash('success', 'Email de réinitialisation envoyé avec succès.');
-    return $this->redirect(
-        $this->adminUrlGenerator
-            ->setController(UserCrudController::class)
-            ->setAction(Crud::PAGE_INDEX)
-            ->generateUrl()
-    );
+    // Redirecting with success message
+    return $this->redirectWithMessage('Email de réinitialisation envoyé avec succès.', true);
 }
 ```
-
-Cette fonction à notamment pour rôle de récupérer les données de l'utilisateur concerné, y ajouter un token de réinitialisation et
-une date de péremption pour ce token afin de les stocker en base de données, puis de générer et d'envoyer un mail contenant le lien
-vers la page de réinitialisation de mot de passe.
-
-⚠️ Il est donc nécéssaire de créer 2 nouveaux attributs pour l'entité "User", afin de stcoker un token de réinitialisation et sa date de péremption :
-
+⚠️ Cette fonction est découpée en plusieurs fonctions, qui vont notamment permettre de récupérer l'utilisateur concerné par la demande de réinitialisation,
+générer un token et une date d'expiration de ce token qui seront stockés en base de données, puis d'envoyer un mail à l'utlisateur, qui contient le lien vers le 
+formulaire de réinitialisation de son mot de passe. 
+Lorsque l'utilisateur en question cliquera sur ce lien, cela appelera le contrôlleur définit dans *"src/Controller/Admin/ResetUserPasswordController.php"* :
 ```php
-#[ORM\Column(nullable: true)]
-private ?string $resetPasswordToken = null;
-
-#[ORM\Column(type: 'datetime_immutable', nullable: true)]
-private ?\DateTimeImmutable $resetPasswordExpiresAt = null;
-```
-
-Le lien du mail redirige vers la route du contrôleur suivant, que l'on crée dans "src/Controller/Admin/ResetUserPasswordController.php" :
-
-```php
-// Resetting the user's password using a custom form
 #[Route('/reset-password/{token}', name: 'app_reset_password')]
 public function resetPassword(
     string $token,
     Request $request,
     EntityManagerInterface $entityManager,
-    UserPasswordHasherInterface $passwordHasher
+
 ): Response {
     // Getting user based on his reset token
     $user = $entityManager->getRepository(User::class)->findOneBy(['resetPasswordToken' => $token]);
 
     // Handling any errors that may occur
     if (!$user || $user->getResetPasswordExpiresAt() < new \DateTimeImmutable()) {
-        $this->addFlash('error', 'Le lien de réinitialisation est invalide ou expiré.');
-        return $this->redirectToRoute('app_login');
+        $this->addFlash('danger', 'Le lien de réinitialisation est invalide ou expiré.');
+        return $this->redirectToRoute('connexion');
     }
 
     // Creating a custom form
@@ -619,8 +252,7 @@ public function resetPassword(
     // Checking and hashing the new password when the custom form is submitted
     if ($form->isSubmitted() && $form->isValid()) {
         $data = $form->getData();
-        $hashedPassword = $passwordHasher->hashPassword($user, $data['password']);
-        $user->setPassword($hashedPassword);
+        $user->setPassword($data['password']);
         $user->setResetPasswordToken(null);
         $user->setResetPasswordExpiresAt(null);
 
@@ -628,7 +260,7 @@ public function resetPassword(
 
         $this->addFlash('success', 'Votre mot de passe a été modifié avec succès.');
 
-        return $this->redirectToRoute('app_login');
+        return $this->redirectToRoute('connexion');
     }
 
     // Calling the custom form's template
@@ -637,73 +269,10 @@ public function resetPassword(
     ]);
 }
 ```
+qui permet de vérifier que le token est encore valide, puis enregistrera le nouveau mot de passe choisi lors de la validation du formulaire 
+qui se trouve sur le template 'reset_password/reset.html.twig' qu'il appelle.
 
-Cette fonction checke que le token de l'utilisateur est le bon et est valide, pour génère un formulaire personalisé que l'on définit dans "src/Form/ResetPasswordType.php":
-
-```php
-// Personalizing a form which allows to change user's password if he asked it
-public function buildForm(FormBuilderInterface $builder, array $options): void
-{
-    $builder
-        ->add('password', PasswordType::class, [
-            'label' => 'Nouveau mot de passe',
-            'constraints' => [
-                new NotBlank([
-                    'message' => 'Le mot de passe ne peut pas être vide.',
-                ]),
-                new Length([
-                    'min' => 8,
-                    'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères.',
-                ]),
-                new Regex([
-                    'pattern' => '/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).+/',
-                    'message' => 'Votre mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial.',
-                ]),
-            ],
-        ])
-        ->add('confirm_password', PasswordType::class, [
-            'label' => 'Confirmez le mot de passe',
-            'mapped' => false,
-            'constraints' => [
-                new NotBlank(),
-            ],
-        ])
-        ->add('_token', HiddenType::class, [
-            'data' => $options['csrf_token_id'] ?? 'reset_password',
-        ]);
-
-
-    // Cheching if the form fields' values are identicals for valid the password
-    $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-        $form = $event->getForm();
-
-        $password = $form->get('password')->getData();
-        $confirmPassword = $form->get('confirm_password')->getData();
-
-        if ($password !== $confirmPassword) {
-            $form->get('confirm_password')->addError(new FormError('Les mots de passe ne correspondent pas.'));
-        }
-    });
-}
-```
-
-On définit aussi un template "templates/reset_password/reset.html.twig" dans lequel afficher ce formulaire :
-
-```html
-{% extends 'base.html.twig' %} {% block title %} Symfocook | Réinitialisation du
-mot de passe {% endblock %} {% block body %}
-<h1>Réinitialiser le mot de passe</h1>
-{{ form_start(form) }} {{ form_row(form.password) }} {{
-form_row(form.confirm_password) }}
-<button type="submit">Confirmer ce nouveau mot de passe</button>
-{{ form_end(form) }} {% endblock %}
-```
-
-Ainsi, lorsque ce formulaire est soumis et que les conditions sur les champs sont validées, le nouveau mot de passe est hashé
-et les données liées au token sont supprimées, puis les données de l'utilisateur sont mises à jour dans la base de données, et il est redirigé sur
-la page de connexion.
-
-### 3. Création du service de pagination (par _Lisa Michallon_)
+### - Création du service de pagination (par _Lisa Michallon_)
 
 L'idée était de m'inspirer du **KnpPaginatorBundle** que j'avais utilisé dans de précédents projets. Je me suis donc rendue sur le dépôt GitHub du bundle et parcouru les fichiers pour comprendre son fonctionnement... sans grand succès 😅
 
@@ -718,3 +287,296 @@ J'ai donc voulu reproduire ça dans mon découpage de fichiers :
 - ProviderInterface : L'utilisation d'une interface ici permet de standardiser le comportement des providers en définissant un contrat minimal que chaque classe qui l'implémente devra respecter. De cette façon, toutes ses implémentations auront les mêmes méthodes principes, ce qui permettra une uniformité dans la logique de pagination.
 
 - DoctrineProvider : Implémente les méthodes définies dans ProviderInterface, ici pour gérer les requêtes Doctrine via un QueryBuilder. Il a été nécessaire de cloner le QueryBuilder pour éviter les effets de bord à cause de la modification de l'objet original. Ce clone est utilisé pour obtenir le nombre total d'items ainsi que les items de la page active grâce à un calcul d'_offset_ en fonction de la page active et de nombre d'items à récupérer pour une page.
+
+### Utilisation du blunder de modules js Webpack
+
+Dans notre projet, nous avons utilisé Webpack Encore, un wrapper simplifiant l'utilisation de Webpack.
+Son rôle principal est de compiler et minifier les fichiers CSS et JavaScript pour optimiser les performances de l'application.
+
+Installation via Composer : `composer require symfony/webpack-encore-bundle`
+Installation des dépendances avec npm : `npm install`
+
+Nous avons ensuite réaliser le fichier de configuration pour Webpack Encore (webpack.config.js) :
+
+```javascript
+const Encore = require("@symfony/webpack-encore");
+
+Encore.setOutputPath("public/build/")
+  .setPublicPath("/build")
+  .addEntry("app", "./assets/app.js")
+  .enableSingleRuntimeChunk()
+  .cleanupOutputBeforeBuild()
+  .enableBuildNotifications()
+  .enableSourceMaps(!Encore.isProduction())
+  .enableVersioning(Encore.isProduction())
+  .enableSassLoader();
+
+module.exports = Encore.getWebpackConfig();
+```
+
+Une fois la configuration en place, nous avons compilé les assets : `npm run dev`
+
+Pour inclure les fichiers CSS et JavaScript générés par Webpack, nous les avons ajoutés dans le template de base (base.html.twig) afin qu’ils soient disponibles sur toutes les pages héritant de ce template :
+La partie css dans le header et la partie js à la fin du body.
+
+```html
+{{ encore_entry_link_tags('app') }} {{ encore_entry_script_tags('app') }}
+```
+
+### Inscription et connexion
+
+1. Gestion de l'inscription :
+
+L'inscription permet aux utilisateurs de créer un compte en fournissant une adresse e-mail et un mot de passe.
+Un formulaire (UserType) est utilisé pour récupérer les informations de l'utilisateur.
+Après soumission et validation du formulaire, le controller prend le relais avec la fonction inscription :
+
+- le mot de passe est haché avant d'être stocké en base de données.
+
+```php
+$user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
+$entityManager->persist($user);
+```
+
+- une fois l'inscription réussie, un message flash est affiché et l'utilisateur est redirigé vers la page de connexion.
+  Formulaire : src/Form/UserType.php | Controller : src/Controller/AuthController
+
+2. Gestion de la connexion :
+
+La connexion permet aux utilisateurs enregistrés de s'authentifier avec leur e-mail et mot de passe.
+L'utilisateur saisit son adresse e-mail et son mot de passe dans le formulaire (LoginType)
+Le controller avec sa fonction login vérifie si l'utilisateur existe en base de données et si le mot de passe est valide.
+
+```php
+$user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+if ($user && $passwordHasher->isPasswordValid($user, $password)) {
+    return $this->redirectToRoute('home');
+} else {
+    $error = 'Identifiants invalides.';
+}
+```
+
+En cas d'erreur, un message d'erreur est affiché.
+Si les informations sont correctes, l'utilisateur est redirigé vers la page d'accueil.
+Après connexion les boutons de la navbar ne sont plus inscription et connexion mais "mon compte" ou admin et deconnexion
+
+```html
+{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+<li class="nav-item">
+  <span class="nav-link">Bonjour {{ app.user.email }}</span>
+</li>
+{% if is_granted('ROLE_ADMIN') %}
+<li class="nav-item">
+  <a class="nav-link" href="{{ path('admin') }}">Accès au BO</a>
+</li>
+{% else %}
+<li class="nav-item">
+  <a class="nav-link" href="{{ path('account') }}">Mon compte</a>
+</li>
+{% endif %}
+<li class="nav-item">
+  <a class="nav-link" href="{{ path('deconnexion') }}">Se déconnecter</a>
+</li>
+{% else %}
+<li class="nav-item">
+  <a class="nav-link" href="{{ path('inscription') }}">Inscription</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ path('connexion') }}">Connexion</a>
+</li>
+{% endif %}
+```
+
+Formulaire : src/Form/LoginType.php | Controller : src/Controller/AuthController
+
+### Création de recette
+
+Les utilisateurs une fois connecté et depuis l'accueil, peuvent créer une recette en remplissant un formulaire.
+Chaque recette peut contenir plusieurs ingrédients, qui sont gérés dynamiquement dans le formulaire.
+
+Le contrôleur avec sa fonction ecrireRecette gère la création de recette et l'association des ingrédients.
+Il suit cette logique :
+
+- Création d'une nouvelle instance de Recipe et génération du formulaire à partir de RecipeType
+
+```php
+$recipe = new Recipe();
+$form = $this->createForm(RecipeType::class, $recipe);
+```
+
+Ce formulaire contient plusieurs champs pour la recette.
+Parmis ceux ci le champs imageFiles permettant l'upload des images :
+
+```php
+->add('imageFiles', FileType::class, [
+    'label' => 'Télécharger des images',
+    'multiple' => true,
+    'mapped' => false,
+    'required' => false,
+])
+```
+
+Après avoir récupéré les images, on leur crée un nom unique et on les stocke dans un répertoire défini :
+
+```php
+foreach ($imageFiles as $imageFile) {
+    $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+    try {
+        $imageFile->move(
+            $this->getParameter('images_directory'),
+            $newFilename
+        );
+    } catch (FileException $e) {
+        $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image.');
+        return $this->redirectToRoute('new_recipe');
+    }
+
+    if ($newFilename) {
+        $image = new RecipeImage();
+        $image->setImagePath($newFilename);
+        $recipe->addImage($image);
+    }
+}
+```
+
+Il faut définir le paramètre images_directory dans services.yaml :
+
+```yaml
+parameters:
+  images_directory: "%kernel.project_dir%/public/uploads/images"
+```
+
+Si c'est bon on crée un objet RecipeImage et qu'on lie à la recette via une relation OneToMany
+Et pour finir, on persist les images en bdd
+
+Le formulaire contient également un champ de type CollectionType pour gérer la liste des ingrédients
+CollectionType permet d'ajouter dynamiquement des ingrédients
+"entry_type" est défini sur le formulaire RecipeIngredientType, qui est le formulaire qui gère les détails de chaque ingrédient.
+"allow_add" est activé pour permettre l'ajout dynamique.
+
+```php
+->add('ingredients', CollectionType::class, [
+    'entry_type' => RecipeIngredientType::class,
+    'allow_add' => true,
+```
+
+Chaque ingrédient est représenté par une entité RecipeIngredient composé et est lié à Ingredient
+Pour chaque ingrédient, il faut ainsi rentrer obligatoirement son nom et sa quantité.
+On choisi l'ingrédient parmis une liste triée par ordre alphabétique.
+
+```php
+return $er->createQueryBuilder('i')
+    ->orderBy('i.name', 'ASC');
+```
+
+Le formulaire utilise data-prototype pour gérer dynamiquement l'ajout d'ingrédients. Un script JavaScript récupère ce prototype et l'insère dans le DOM lorsque l'utilisateur clique sur "Ajouter un ingrédient" :
+
+```html
+<div
+  id="ingredients"
+  data-prototype="{{ form_widget(form.ingredients.vars.prototype)|e('html_attr') }}"
+>
+  <div class="row g-3" id="ingredients-container">
+    {% for ingredientForm in form.ingredients %}
+    <div class="col-3">
+      <div class="ingredient-group border rounded p-3 shadow-sm">
+        {{ form_row(ingredientForm.ingredient) }} {{
+        form_row(ingredientForm.quantity) }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+```
+
+- Après vérification de la soumission et validation du formulaire, il va associer l'auteur à la recette
+- Persistance de la recette et de ses ingrédients en bdd
+- Redirection après validation.
+
+### Affichage de nos recettes dans "Mon Compte"
+
+Si il y en a, on affiche nos recette avec un léger descriptif et la première image
+Il y a également un bouton pour accéder à la modification de la recette et un bouton pour sa suppression.
+
+### Modification de ma recette
+
+Après le clique sur le bouton de modification de ma recette, on est redirigé sur le même formulaire que celui de création de recette, mais avec cette fois ci, nos données pré remplies :
+
+- Le controller via sa fonction modify-recipe va récupérer la recette et ses données :
+
+```php
+$recipe = $entityManager->getRepository(Recipe::class)->find($id);
+```
+
+- Après vérification et qu'il s'agit du bon user, on crée le formulaire en lui injectant les données :
+
+```php
+$form = $this->createForm(RecipeType::class, $recipe);
+$form->handleRequest($request);
+```
+
+- On gère ensuite les images
+  (Problème ici : ma gestion n'a été faite que pour l'ajout d'une image et j'ai oublié de le changer)
+
+```php
+$imageFiles = $form->get('imageFiles')->getData();
+if ($imageFiles) {
+    $newFilename = uniqid() . '.' . $imageFiles->guessExtension();
+    try {
+        $imageFiles->move(
+            $this->getParameter('images_directory'),
+            $newFilename
+        );
+    } catch (FileException $e) {
+        $this->addFlash('error', 'Une erreur s\'est produite lors de l\'upload de l\'image.');
+    }
+
+    // update image on entity
+    $recipe->setImagePath($newFilename);
+}
+```
+
+- On sauvegarde ensuite les modifications et le tour est joué :
+
+```php
+if ($form->isSubmitted() && $form->isValid()) {
+    $entityManager->flush();
+
+    $this->addFlash('success', 'La recette a été modifiée avec succès.');
+
+    return $this->redirectToRoute('account');
+}
+```
+
+Modification qui devraient être faites pour une meilleure modification de recette :
+
+- Gestion d'ajout de plusieurs images comme mentionné plus tôt
+- Possibilité de suppression des images déjà ajouté
+- Possibilité d'ajout et suppresion des ingrédients :/
+
+### Suppression de ma recette
+
+Si l'on clique sur le bouton de suppression de notre recette dans "Mon compte", la recette va pouvoir disparaitre de notre compte.
+La fonction deleteRecipe dans notre controller va s'en charger :
+
+- Vérification de l'user
+- Récupération de la recette :
+
+```php
+$recipe = $entityManager->getRepository(Recipe::class)->find($id);
+```
+
+- Vérification que celui qui la supprime en est bien l'auteur :
+
+```php
+if ($recipe->getAuthor() !== $user) {
+```
+
+- Suppression de la recette et application sur la bdd :
+
+```php
+$entityManager->remove($recipe);
+$entityManager->flush();
+```
+
+- Confirmation et redirection à mon compte où l'on peut voir que la recette n'y est plus

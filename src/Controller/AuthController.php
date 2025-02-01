@@ -47,8 +47,6 @@ class AuthController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
-
             $entityManager->persist($user);
             $entityManager->flush();
 
