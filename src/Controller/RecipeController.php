@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+
 class RecipeController extends AbstractController
 {
     #[Route('/recipes', name: 'recipes')]
@@ -98,8 +99,6 @@ class RecipeController extends AbstractController
             $this->addFlash('success', 'Votre recette a été créée avec succès ! Vous pouvez la gérer depuis votre espace "Mon compte"');
             $this->addFlash('success', 'Votre recette a été créée avec succès ! Vous pouvez la gérer depuis votre espace "Mon compte"');
 
-            return $this->redirectToRoute('home');
-        }
             return $this->redirectToRoute('home');
         }
 
