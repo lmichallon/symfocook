@@ -1,7 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Écrire une recette{% endblock %}
-
 {% block body %}
 <div class="container mt-1">
     <h1 class="text-center mb-3">Écrire une recette</h1>
@@ -20,6 +18,9 @@
         </div>
         <div class="mb-3">
             {{ form_row(form.category, {'attr': {'class': 'form-select'}}) }}
+        </div>
+        <div class="mb-3">
+            {{ form_row(form.imageFiles, {'attr': {'class': 'form-select', 'multiple': 'multiple'}}) }}
         </div>
 
         <h3 class="text-center">Ingrédients</h3>

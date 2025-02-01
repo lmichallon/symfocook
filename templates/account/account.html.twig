@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1 class="text-center">Bienvenue {{ user.email }}</h1>
+
+<div class="text-center mt-5 custom-button">
+    <a class="nav-link" href="{{ path('new_recipe') }}" class="custom-button">Écrire une recette</a>
+</div>
+
+<div class="container my-5">
+    <h3 class="text-center mb-4 text-success">Vos recettes :</h3>
+
+    {% if recipes is not empty %}
+    <ul class="row list-unstyled g-4">
+        {% for recipe in recipes %}
+        <li class="col-12 col-md-6 col-lg-4">
+            <div class="card border-success pb-2 shadow-sm h-100">
+                <div class="card-body text-center">
+                    {% if recipe.images|length > 0 %}
+                        {% set firstImage = recipe.images|first %}
+                        <img src="{{ asset('uploads/images/' ~ firstImage.getImagePath()) }}" alt="Image de la recette" class="recipe-image w-100 h-auto">
+                    {% else %}
+                        <p>Aucune image disponible pour cette recette.</p>
+                    {% endif %}
+
+                    <h4 class="card-title text-success mt-2">{{ recipe.title }}</h4>
+                    <p class="card-text">⏱️ Durée : <strong>{{ recipe.duration }}</strong> minutes</p>
+                    <p class="card-text">💪 Difficulté : <strong>{{ recipe.getDifficultyAsString() }}</strong></p>
+
+                    <div class="row gx-2">
+                        <div class="col-6">
+                            <a href="{{ path('modify_recipe', {'id': recipe.id}) }}"
+                                class="btn btn-warning w-100 text-center">
+                                Modifier la recette
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <form method="post" action="{{ path('delete_recipe', {'id': recipe.id}) }}"
+                                onsubmit="return confirm('Voulez-vous vraiment supprimer cette recette ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ recipe.id) }}">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    Supprimer la recette
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-center text-muted">Aucune recette trouvée. Essayez d'en ajouter une nouvelle !</p>
+    {% endif %}
+</div>
+{% endblock %}

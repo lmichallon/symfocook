@@ -26,6 +26,7 @@ class AuthController extends AbstractController
             $password = $data['password'] ?? '';
 
             $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+
             if ($user && $passwordHasher->isPasswordValid($user, $password)) {
                 return $this->redirectToRoute('home');
             } else {
@@ -46,7 +47,6 @@ class AuthController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
             $entityManager->persist($user);
             $entityManager->flush();
 
