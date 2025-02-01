@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ recipe.title }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="display-4 text-center">{{ recipe.title }}</h1>
+
+        <div class="text-center mt-3">
+            <span class="badge bg-primary">{{ recipe.difficultyAsString }}</span>
+            <span class="badge bg-secondary">{{ recipe.category.name }}</span>
+            <p class="text-muted">Par {{ recipe.author.email }}</p>
+        </div>
+
+        <hr>
+
+        <div class="mt-4">
+            <h2>Description</h2>
+            <p>{{ recipe.content }}</p>
+        </div>
+
+        <div class="mt-4">
+            <h2>Détails</h2>
+            <ul>
+                <li><strong>Durée :</strong> {{ recipe.duration }} minutes</li>
+                <li><strong>Catégorie :</strong> {{ recipe.category.name }}</li>
+                <li><strong>Auteur :</strong> {{ recipe.author.email }}</li>
+            </ul>
+        </div>
+
+        {% if recipe.images is not empty %}
+            <div class="mt-4">
+                <h2>Images</h2>
+                <div class="d-flex flex-wrap gap-3 justify-content-start">
+                    {% for image in recipe.images %}
+                        <img src="{{ asset(image.imagePath) }}" alt="{{ recipe.title }}" class="img-fluid rounded" style="max-width: 200px;">
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="mt-4">
+            <h2>Ingrédients</h2>
+            <ul>
+                {% for ingredient in recipe.ingredients %}
+                    <li>{{ ingredient.quantity }} - {{ ingredient.ingredient.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{{ path('recipes') }}" class="btn btn-success">Retour à la liste des recettes</a>
+        </div>
+    </div>
+{% endblock %}

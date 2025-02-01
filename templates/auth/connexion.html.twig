@@ -1,12 +1,10 @@
-{# templates/auth/connexion.html.twig #}
-
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="card mx-auto" style="max-width: 500px;">
+<div class="card mx-auto" style="max-width: 650px;">
     <div class="card-body mt-10 background-grey">
         <h2 class="card-title text-center text-success">Connectez-vous</h2>
-        <p class="text-center text-muted">Accédez à vos recettes préférées.</p>
+        <p class="text-center text-muted">Gérez vos recettes personnelles</p>
         
         <form action="{{ path('connexion') }}" method="post" class="mt-4">
             <div class="mb-3">
@@ -27,7 +25,10 @@
             </div>
         </form>
         <br>
-        <span class="text-center">Vous n'avez pas de compte ? <a href="{{ path('inscription') }}" class="text-decoration-none">Inscrivez-vous</a></span>
+        <div class="text-center">Vous n'avez pas de compte ? <a href="{{ path('inscription') }}" class="text-decoration-none">Inscrivez-vous</a></div>
+        <div class="text-center mt-3">
+            <a href="{{ path('password_request') }}" class="text-decoration-none">Mot de passe oublié ?</a>
+        </div>
     </div>
 </div>
 {% endblock %}

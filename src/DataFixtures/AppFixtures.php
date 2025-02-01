@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Category;
 use App\Entity\Ingredient;
 use App\Entity\Recipe;
+use App\Entity\RecipeImage;
 use App\Entity\RecipeIngredient;
 use App\Entity\User;
 use App\Enum\Difficulty;
@@ -16,6 +17,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class AppFixtures extends Fixture
 {
     private const NB_USERS = 10;
+    private const NB_IMAGES_PER_RECIPE = 3;
 
     public function __construct(
         private UserPasswordHasherInterface $hasher
@@ -33,7 +35,7 @@ class AppFixtures extends Fixture
 
         $ingredients = $this->loadIngredients($manager);
 
-        $recipes = $this->loadRecipes($manager, $categories, $ingredients, $users);
+        $recipes = $this->loadRecipes($manager, $categories, $ingredients, $users, $faker);
 
         $manager->flush();
     }
@@ -47,17 +49,17 @@ class AppFixtures extends Fixture
             if ($i === 0) {
                 $user
                     ->setEmail('admin@symfocook.com')
-                    ->setPassword($this->hasher->hashPassword($user, "adminPass"))
+                    ->setPassword("adminPass")
                     ->setRoles(["ROLE_ADMIN"]);
             } elseif ($i === 1) {
                 $user
                     ->setEmail('user@test.com')
-                    ->setPassword($this->hasher->hashPassword($user, "testPass"))
+                    ->setPassword("testPass")
                     ->setRoles(["ROLE_USER"]);
             } else {
                 $user
                     ->setEmail($faker->safeEmail)
-                    ->setPassword($this->hasher->hashPassword($user, $faker->password(8)))
+                    ->setPassword($faker->password(8))
                     ->setRoles(["ROLE_USER"]);
             }
 
@@ -101,7 +103,9 @@ class AppFixtures extends Fixture
     }
 
 
-    private function loadRecipes(ObjectManager $manager, array $categories, array $ingredients, array $users): void
+
+
+    private function loadRecipes(ObjectManager $manager, array $categories, array $ingredients, array $users, $faker): void
     {
         $recipesData = $this->readJsonFile(__DIR__ . '/recipe.json');
         $recipeIngredientsData = $this->readJsonFile(__DIR__ . '/recipe_ingredient.json');
@@ -133,6 +137,8 @@ class AppFixtures extends Fixture
                 ->setCategory($categories[$data['category_id']])
                 ->setAuthor($users[$data['author_id'] - 1]);
 
+            $this->loadRecipeImages($manager, $recipe, $faker);
+
             $recipes[$data['id']] = $recipe;
             $manager->persist($recipe);
         }
@@ -148,6 +154,16 @@ class AppFixtures extends Fixture
         }
     }
 
+    private function loadRecipeImages(ObjectManager $manager, Recipe $recipe, $faker): void
+    {
+        for ($i = 0; $i < self::NB_IMAGES_PER_RECIPE; $i++) {
+            $image = new RecipeImage();
+            $image
+                ->setRecipe($recipe)
+                ->setImagePath('https://picsum.photos/640/480?random='.$i);
+            $manager->persist($image);
+        }
+    }
 
     private function readJsonFile(string $path): array
     {

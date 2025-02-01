@@ -5,10 +5,21 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Réinitialiser le mot de passe</h1>
-    {{ form_start(form) }}
-    {{ form_row(form.password) }}
-    {{ form_row(form.confirm_password) }}
-    <button type="submit">Confirmer ce nouveau mot de passe</button>
-    {{ form_end(form) }}
+    <div class="card m-auto" style="max-width: 650px;">
+        <div class="card-body background-grey">
+            <h1 class="card-title text-center text-success">Réinitialisation du mot de passe</h1>
+            <p class="text-center text-muted">Choisissez le nouveau mot de passe qui vous permettra d'accéder à votre compte Symfocook</p>
+            {{ form_start(form, {'attr': {'class': 'mt-4'}}) }}
+            <div class="mb-3">
+                {{ form_row(form.password) }}
+            </div>
+            <div class="mb-3">
+                {{ form_row(form.confirm_password) }}
+            </div>
+            <div class="d-grid">
+                {{ form_widget(form.submit) }}
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
 {% endblock %}

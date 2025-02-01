@@ -37,6 +37,11 @@ footer {
   bottom: 0;
   width: 100%;
 }
+
+footer a {
+  color: white;
+}
+
 h1,
 h2,
 h3 {
@@ -90,7 +95,6 @@ a {
 
 .recipe-submit:hover {
   background-color: #85bb65;
-  transform: scale(1.05);
 }
 
 .recipe-submit:active {
@@ -188,9 +192,10 @@ a {
 }
 
 .custom-button {
-  padding: 10px 20px; /* Padding personnalisé */
+  display: block;
+  padding: 10px 20px;
   margin: 0 auto;
-  display: inline-block;
+  width: fit-content;
   border-radius: 50px;
   background-color: #2d7232;
   transition: background-color 0.3s ease;
@@ -240,3 +245,4 @@ a {
   font-style: italic;
   text-align: center;
 }
+

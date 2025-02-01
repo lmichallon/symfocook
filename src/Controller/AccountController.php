@@ -81,30 +81,36 @@ class AccountController extends AbstractController
         $form = $this->createForm(RecipeType::class, $recipe);
         $form->handleRequest($request);
 
-        // image path
-        $imageFiles = $form->get('imageFiles')->getData();
-        if ($imageFiles) {
-            $newFilename = uniqid() . '.' . $imageFiles->guessExtension();
-            try {
-                $imageFiles->move(
-                    $this->getParameter('images_directory'),
-                    $newFilename
-                );
-            } catch (FileException $e) {
-                $this->addFlash('error', 'Une erreur s\'est produite lors de l\'upload de l\'image.');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $imageFiles = $form->get('imageFiles')->getData();
+            if ($imageFiles) {
+                foreach ($imageFiles as $imageFile) {
+                    if ($imageFile instanceof UploadedFile) {
+                        $newFilename = uniqid() . '.' . $imageFile->guessExtension();
+
+                        try {
+                            $imageFile->move(
+                                $this->getParameter('images_directory'),
+                                $newFilename
+                            );
+
+                            $recipeImage = new RecipeImage();
+                            $recipeImage->setRecipe($recipe);
+                            $recipeImage->setImagePath($newFilename);
+
+                            $entityManager->persist($recipeImage);
+                        } catch (FileException $e) {
+                            $this->addFlash('error', 'Une erreur s\'est produite lors de l\'upload de l\'image.');
+                        }
+                    }
+                }
             }
 
-            // update image on entity
-            $recipe->setImagePath($newFilename);
-        }
-
-        // if good -> request modify
-        if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
             $this->addFlash('success', 'La recette a été modifiée avec succès.');
 
-            return $this->redirectToRoute('account'); 
+            return $this->redirectToRoute('account');
         }
 
         return $this->render('recipe/modify_recipe.html.twig', [
@@ -112,5 +118,4 @@ class AccountController extends AbstractController
             'recipe' => $recipe,
         ]);
     }
-
 }

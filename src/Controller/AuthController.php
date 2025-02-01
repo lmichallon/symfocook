@@ -21,7 +21,6 @@ class AuthController extends AbstractController
     #[Route('/connexion', name: 'connexion')]
     public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
-        // if connexion error
         $error = $authenticationUtils->getLastAuthenticationError();
 
         if ($request->isMethod('POST')) {
@@ -30,7 +29,6 @@ class AuthController extends AbstractController
             $email = $data['email'] ?? '';
             $password = $data['password'] ?? '';
 
-            // find by email
             $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
 
             if ($user && $passwordHasher->isPasswordValid($user->getPassword(), $password, $user->getSalt())) {
@@ -53,12 +51,10 @@ class AuthController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // encode password
-            $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
-
-            // save user
             $entityManager->persist($user);
             $entityManager->flush();
+
+            $this->addFlash('success', 'Votre compte a été créé avec succès ! Vous pouvez maintenant vous connecter.');
 
             return $this->redirectToRoute('connexion');
         }
