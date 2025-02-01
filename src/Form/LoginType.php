@@ -41,7 +41,7 @@ class LoginType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'csrf_protection' => true, // Assurez-vous que la protection CSRF est activée
+            'csrf_protection' => true, 
         ]);
     }
 }

@@ -2,7 +2,7 @@
 
 _Projet Symfony dans le cadre du Mastère 1 en Ingénierie du Web à l'ESGI de Lyon_
 
-_Par Michalon Lisa, Duperthuy Hugo et Cauvet Louis_
+_Par Michalon Lisa (lmichellon), Duperthuy Hugo (HeavenProx) et Cauvet Louis (Louis-Cauvet)_
 
 ## Objectif du projet
 
@@ -718,3 +718,165 @@ J'ai donc voulu reproduire ça dans mon découpage de fichiers :
 - ProviderInterface : L'utilisation d'une interface ici permet de standardiser le comportement des providers en définissant un contrat minimal que chaque classe qui l'implémente devra respecter. De cette façon, toutes ses implémentations auront les mêmes méthodes principes, ce qui permettra une uniformité dans la logique de pagination.
 
 - DoctrineProvider : Implémente les méthodes définies dans ProviderInterface, ici pour gérer les requêtes Doctrine via un QueryBuilder. Il a été nécessaire de cloner le QueryBuilder pour éviter les effets de bord à cause de la modification de l'objet original. Ce clone est utilisé pour obtenir le nombre total d'items ainsi que les items de la page active grâce à un calcul d'_offset_ en fonction de la page active et de nombre d'items à récupérer pour une page.
+
+### Utilisation du blunder de modules js Webpack
+
+Dans notre projet, nous avons utilisé Webpack Encore, un wrapper simplifiant l'utilisation de Webpack.
+Son rôle principal est de compiler et minifier les fichiers CSS et JavaScript pour optimiser les performances de l'application.
+
+Installation via Composer : `composer require symfony/webpack-encore-bundle`
+Installation des dépendances avec npm : `npm install`
+
+Nous avons ensuite réaliser le fichier de configuration pour Webpack Encore (webpack.config.js) :
+
+```javascript
+const Encore = require("@symfony/webpack-encore");
+
+Encore.setOutputPath("public/build/")
+  .setPublicPath("/build")
+  .addEntry("app", "./assets/app.js")
+  .enableSingleRuntimeChunk()
+  .cleanupOutputBeforeBuild()
+  .enableBuildNotifications()
+  .enableSourceMaps(!Encore.isProduction())
+  .enableVersioning(Encore.isProduction())
+  .enableSassLoader();
+
+module.exports = Encore.getWebpackConfig();
+```
+
+Une fois la configuration en place, nous avons compilé les assets : `npm run dev`
+
+Pour inclure les fichiers CSS et JavaScript générés par Webpack, nous les avons ajoutés dans le template de base (base.html.twig) afin qu’ils soient disponibles sur toutes les pages héritant de ce template :
+La partie css dans le header et la partie js à la fin du body.
+
+```html
+{{ encore_entry_link_tags('app') }} {{ encore_entry_script_tags('app') }}
+```
+
+### Inscription et connexion
+
+1. Gestion de l'inscription :
+
+L'inscription permet aux utilisateurs de créer un compte en fournissant une adresse e-mail et un mot de passe.
+Un formulaire (UserType) est utilisé pour récupérer les informations de l'utilisateur.
+Après soumission et validation du formulaire, le controller prend le relais avec la fonction inscription :
+
+- le mot de passe est haché avant d'être stocké en base de données.
+
+```php
+$user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
+$entityManager->persist($user);
+```
+
+- une fois l'inscription réussie, un message flash est affiché et l'utilisateur est redirigé vers la page de connexion.
+  Formulaire : src/Form/UserType.php | Controller : src/Controller/AuthController
+
+2. Gestion de la connexion :
+
+La connexion permet aux utilisateurs enregistrés de s'authentifier avec leur e-mail et mot de passe.
+L'utilisateur saisit son adresse e-mail et son mot de passe dans le formulaire (LoginType)
+Le controller avec sa fonction login vérifie si l'utilisateur existe en base de données et si le mot de passe est valide.
+
+```php
+$user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+if ($user && $passwordHasher->isPasswordValid($user, $password)) {
+    return $this->redirectToRoute('home');
+} else {
+    $error = 'Identifiants invalides.';
+}
+```
+
+En cas d'erreur, un message d'erreur est affiché.
+Si les informations sont correctes, l'utilisateur est redirigé vers la page d'accueil.
+Après connexion les boutons de la navbar ne sont plus inscription et connexion mais "mon compte" ou admin et deconnexion
+
+```html
+{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+<li class="nav-item">
+  <span class="nav-link">Bonjour {{ app.user.email }}</span>
+</li>
+{% if is_granted('ROLE_ADMIN') %}
+<li class="nav-item">
+  <a class="nav-link" href="{{ path('admin') }}">Accès au BO</a>
+</li>
+{% else %}
+<li class="nav-item">
+  <a class="nav-link" href="{{ path('account') }}">Mon compte</a>
+</li>
+{% endif %}
+<li class="nav-item">
+  <a class="nav-link" href="{{ path('deconnexion') }}">Se déconnecter</a>
+</li>
+{% else %}
+<li class="nav-item">
+  <a class="nav-link" href="{{ path('inscription') }}">Inscription</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="{{ path('connexion') }}">Connexion</a>
+</li>
+{% endif %}
+```
+
+Formulaire : src/Form/LoginType.php | Controller : src/Controller/AuthController
+
+### Création de recette
+
+Les utilisateurs une fois connecté et depuis l'accueil, peuvent créer une recette en remplissant un formulaire.
+Chaque recette peut contenir plusieurs ingrédients, qui sont gérés dynamiquement dans le formulaire.
+
+Le contrôleur avec sa fonction ecrireRecette gère la création de recette et l'association des ingrédients.
+Il suit cette logique :
+
+- Création d'une nouvelle instance de Recipe et génération du formulaire à partir de RecipeType
+
+```php
+$recipe = new Recipe();
+$form = $this->createForm(RecipeType::class, $recipe);
+```
+
+Ce formulaire contient plusieurs champs pour la recette ainsi qu'un champ de type CollectionType pour gérer la liste des ingrédients
+CollectionType permet d'ajouter dynamiquement des ingrédients
+"entry_type" est défini sur le formulaire RecipeIngredientType, qui est le formulaire qui gère les détails de chaque ingrédient.
+"allow_add" est activé pour permettre l'ajout dynamique.
+
+```php
+->add('ingredients', CollectionType::class, [
+    'entry_type' => RecipeIngredientType::class,
+    'allow_add' => true,
+```
+
+Chaque ingrédient est représenté par une entité RecipeIngredient composé et est lié à Ingredient
+Pour chaque ingrédient, il faut ainsi rentrer obligatoirement son nom et sa quantité.
+On choisi l'ingrédient parmis une liste triée par ordre alphabétique.
+
+```php
+return $er->createQueryBuilder('i')
+    ->orderBy('i.name', 'ASC');
+```
+
+Le formulaire utilise data-prototype pour gérer dynamiquement l'ajout d'ingrédients. Un script JavaScript récupère ce prototype et l'insère dans le DOM lorsque l'utilisateur clique sur "Ajouter un ingrédient" :
+
+```html
+<div
+  id="ingredients"
+  data-prototype="{{ form_widget(form.ingredients.vars.prototype)|e('html_attr') }}"
+>
+  <div class="row g-3" id="ingredients-container">
+    {% for ingredientForm in form.ingredients %}
+    <div class="col-3">
+      <div class="ingredient-group border rounded p-3 shadow-sm">
+        {{ form_row(ingredientForm.ingredient) }} {{
+        form_row(ingredientForm.quantity) }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+```
+
+- Après vérification de la soumission et validation du formulaire, il va associer l'auteur à la recette
+- Persistance de la recette et de ses ingrédients en bdd
+- Redirection après validation.
+
+### Modification de recette
